@@ -71,8 +71,38 @@ dirtype_t diags[] =
     DI_NORTHWEST, DI_NORTHEAST, DI_SOUTHWEST, DI_SOUTHEAST
 };
 
+extern int M_CheckParm (const char* check);
+extern void ST_PrintMsg(const char *format, ...);
+
+extern void VSLM_RespawnMonster(mobj_t *actor);
+extern void VSLM_TriggerTag666(boolean tag667);
 
 
+void A_Tag666(void)
+{
+    if(M_CheckParm("-devparm"))
+    {
+        ST_PrintMsg("Triggered Tag 666");
+    }
+    if(!M_CheckParm("-vslmdebug"))
+    {
+        VSLM_TriggerTag666(false);
+        return;
+    }
+}
+
+void A_Tag667(void)
+{
+    if(M_CheckParm("-devparm"))
+    {
+        ST_PrintMsg("Triggered Tag 667");
+    }
+    if(!M_CheckParm("-vslmdebug"))
+    {
+        VSLM_TriggerTag666(true);
+        return;
+    }
+}
 
 
 void A_Fall (mobj_t *actor);
@@ -573,7 +603,6 @@ void A_KeenDie (mobj_t* mo)
 {
     thinker_t*	th;
     mobj_t*	mo2;
-    line_t	junk;
 
     A_Fall (mo);
     
@@ -594,8 +623,9 @@ void A_KeenDie (mobj_t* mo)
 	}
     }
 
-    junk.tag = 666;
-    EV_DoDoor(&junk, vld_open);
+    //junk.tag = 666;
+    //EV_DoDoor(&junk, vld_open);
+    A_Tag666();
 }
 
 
@@ -1739,7 +1769,6 @@ void A_BossDeath (mobj_t* mo)
 {
     thinker_t*	th;
     mobj_t*	mo2;
-    line_t	junk;
     int		i;
 		
     if ( gamemode == commercial)
@@ -1793,50 +1822,61 @@ void A_BossDeath (mobj_t* mo)
 	// [crispy] Master Levels in PC slot 7
 	(gamemission == pack_master && (gamemap == 14 || gamemap == 15 || gamemap == 16)))
 	{
-	    if (mo->type == MT_FATSO)
-	    {
-		junk.tag = 666;
-		EV_DoFloor(&junk,lowerFloorToLowest);
-		return;
-	    }
+            switch (mo->type)
+            {
+                case MT_BABY:
+                    A_Tag667();
+                    break;
+
+                default:
+                    A_Tag666();
+            }
+
+            // if (mo->type == MT_FATSO)
+	    // {
+		// //junk.tag = 666;
+		// //EV_DoFloor(&junk,lowerFloorToLowest);
+		// return;
+	    // }
 	    
-	    if (mo->type == MT_BABY)
-	    {
-		junk.tag = 667;
-		EV_DoFloor(&junk,raiseToTexture);
-		return;
-	    }
+	    // if (mo->type == MT_BABY)
+	    // {
+		// //junk.tag = 667;
+		// //EV_DoFloor(&junk,raiseToTexture);
+		// return;
+	    // }
 	}
     }
     else
     {
-	switch(gameepisode)
-	{
-	  case 1:
-	    junk.tag = 666;
-	    EV_DoFloor (&junk, lowerFloorToLowest);
-	    return;
-	    break;
+        A_Tag666();
+	// switch(gameepisode)
+	// {
+	//   case 1:
+	//     junk.tag = 666;
+	//     EV_DoFloor (&junk, lowerFloorToLowest);
+	//     return;
+	//     break;
 	    
-	  case 4:
-	    switch(gamemap)
-	    {
-	      case 6:
-		junk.tag = 666;
-		EV_DoDoor (&junk, vld_blazeOpen);
-		return;
-		break;
+	//   case 4:
+	//     switch(gamemap)
+	//     {
+	//       case 6:
+	// 	junk.tag = 666;
+	// 	EV_DoDoor (&junk, vld_blazeOpen);
+	// 	return;
+	// 	break;
 		
-	      case 8:
-		junk.tag = 666;
-		EV_DoFloor (&junk, lowerFloorToLowest);
-		return;
-		break;
-	    }
-	}
+	//       case 8:
+	// 	junk.tag = 666;
+	// 	EV_DoFloor (&junk, lowerFloorToLowest);
+	// 	return;
+	// 	break;
+	//     }
+	// }
     }
 	
-    G_ExitLevel ();
+    //G_ExitLevel ();
 }
 
 
@@ -2011,7 +2051,8 @@ void A_BrainExplode (mobj_t* mo)
 
 void A_BrainDie (mobj_t*	mo)
 {
-    G_ExitLevel ();
+    //G_ExitLevel ();
+    A_Tag666();
 }
 
 void A_BrainSpit (mobj_t*	mo)

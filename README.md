@@ -1,3 +1,19 @@
+# ViperSLM's modifications
+This branch is based on the 7.0 release of [Crispy Doom](https://github.com/fabiangreffrath/crispy-doom)
+
+## Features added to this branch (so far):
+* Modified P_NightmareRespawn (called VSLM_RespawnMonster) to respawn monsters as if
+  being revived by an Arch-vile, with the old teleport method serving as a fallback
+  for monsters that do not have a 'raise' state. Additionally, the respawn animation
+  has a fire effect (uses the 'SPAWNFIRE' states which was used in Doom II's MAP30),
+  and also adds a new state into the mobjinfo_t struct (xraisestate) which reverses
+  the gibbing animation if the monster being revived was gibbed.
+
+* Tag 666/667 events are stored inside of it's own function (VSLM_TriggerTag666)
+
+All new functions added are inside of it's own source file (vslm.c) and are called
+through externs.
+
 # Crispy Doom
 [![Crispy Doom Icon](https://github.com/fabiangreffrath/crispy-doom/blob/master/data/doom.png)](https://github.com/fabiangreffrath/crispy-doom)
 

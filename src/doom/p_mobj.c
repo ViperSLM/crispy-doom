@@ -37,6 +37,8 @@
 
 #include "doomstat.h"
 
+// New respawn function
+extern void VSLM_RespawnMonster(mobj_t *actor);
 
 void G_PlayerReborn (int player);
 void P_SpawnMapThing (mapthing_t*	mthing);
@@ -635,7 +637,8 @@ void P_MobjThinker (mobj_t* mobj)
 	if (P_Random () > 4)
 	    return;
 
-	P_NightmareRespawn (mobj);
+	//P_NightmareRespawn (mobj);
+    VSLM_RespawnMonster(mobj);
     }
 
 }

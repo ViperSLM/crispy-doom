@@ -146,6 +146,8 @@ void A_Detonate();
 void A_Mushroom();
 void A_BetaSkullAttack();
 
+// VSLM utils
+void VSLM_SpawnFire();
 
 state_t	states[NUMSTATES] = {
     {SPR_TROO,0,-1,{NULL},S_NULL,0,0},	// S_NULL
@@ -355,10 +357,21 @@ state_t	states[NUMSTATES] = {
     {SPR_POSS,18,5,{NULL},S_POSS_XDIE8,0,0},	// S_POSS_XDIE7
     {SPR_POSS,19,5,{NULL},S_POSS_XDIE9,0,0},	// S_POSS_XDIE8
     {SPR_POSS,20,-1,{NULL},S_NULL,0,0},	// S_POSS_XDIE9
-    {SPR_POSS,10,5,{NULL},S_POSS_RAISE2,0,0},	// S_POSS_RAISE1
-    {SPR_POSS,9,5,{NULL},S_POSS_RAISE3,0,0},	// S_POSS_RAISE2
-    {SPR_POSS,8,5,{NULL},S_POSS_RAISE4,0,0},	// S_POSS_RAISE3
-    {SPR_POSS,7,5,{NULL},S_POSS_RUN1,0,0},	// S_POSS_RAISE4
+    {SPR_POSS,10,5,{VSLM_SpawnFire},S_POSS_RAISE2,0,0},	// S_POSS_RAISE1
+    {SPR_POSS,9,5,{VSLM_SpawnFire},S_POSS_RAISE3,0,0},	// S_POSS_RAISE2
+    {SPR_POSS,8,5,{VSLM_SpawnFire},S_POSS_RAISE4,0,0},	// S_POSS_RAISE3
+    {SPR_POSS,7,5,{VSLM_SpawnFire},S_POSS_RUN1,0,0},	// S_POSS_RAISE4
+
+    {SPR_POSS,20,5,{VSLM_SpawnFire},S_POSS_XRAISE2,0,0},	// S_POSS_XRAISE1
+    {SPR_POSS,19,5,{VSLM_SpawnFire},S_POSS_XRAISE3,0,0},	// S_POSS_XRAISE2
+    {SPR_POSS,18,5,{VSLM_SpawnFire},S_POSS_XRAISE4,0,0},	// S_POSS_XRAISE3
+    {SPR_POSS,17,5,{VSLM_SpawnFire},S_POSS_XRAISE5,0,0},	// S_POSS_XRAISE4
+    {SPR_POSS,16,5,{VSLM_SpawnFire},S_POSS_XRAISE6,0,0},	// S_POSS_XRAISE5
+    {SPR_POSS,15,5,{VSLM_SpawnFire},S_POSS_XRAISE7,0,0},	// S_POSS_XRAISE6
+    {SPR_POSS,14,5,{VSLM_SpawnFire},S_POSS_XRAISE8,0,0},	// S_POSS_XRAISE7
+    {SPR_POSS,13,5,{VSLM_SpawnFire},S_POSS_XRAISE9,0,0},	// S_POSS_XRAISE8
+	{SPR_POSS,12,5,{VSLM_SpawnFire},S_POSS_RUN1,0,0},	    // S_POSS_XRAISE9
+
     {SPR_SPOS,0,10,{A_Look},S_SPOS_STND2,0,0},	// S_SPOS_STND
     {SPR_SPOS,1,10,{A_Look},S_SPOS_STND,0,0},	// S_SPOS_STND2
     {SPR_SPOS,0,3,{A_Chase},S_SPOS_RUN2,0,0},	// S_SPOS_RUN1
@@ -388,11 +401,22 @@ state_t	states[NUMSTATES] = {
     {SPR_SPOS,18,5,{NULL},S_SPOS_XDIE8,0,0},	// S_SPOS_XDIE7
     {SPR_SPOS,19,5,{NULL},S_SPOS_XDIE9,0,0},	// S_SPOS_XDIE8
     {SPR_SPOS,20,-1,{NULL},S_NULL,0,0},	// S_SPOS_XDIE9
-    {SPR_SPOS,11,5,{NULL},S_SPOS_RAISE2,0,0},	// S_SPOS_RAISE1
-    {SPR_SPOS,10,5,{NULL},S_SPOS_RAISE3,0,0},	// S_SPOS_RAISE2
-    {SPR_SPOS,9,5,{NULL},S_SPOS_RAISE4,0,0},	// S_SPOS_RAISE3
-    {SPR_SPOS,8,5,{NULL},S_SPOS_RAISE5,0,0},	// S_SPOS_RAISE4
-    {SPR_SPOS,7,5,{NULL},S_SPOS_RUN1,0,0},	// S_SPOS_RAISE5
+    {SPR_SPOS,11,5,{VSLM_SpawnFire},S_SPOS_RAISE2,0,0},	// S_SPOS_RAISE1
+    {SPR_SPOS,10,5,{VSLM_SpawnFire},S_SPOS_RAISE3,0,0},	// S_SPOS_RAISE2
+    {SPR_SPOS,9,5,{VSLM_SpawnFire},S_SPOS_RAISE4,0,0},	// S_SPOS_RAISE3
+    {SPR_SPOS,8,5,{VSLM_SpawnFire},S_SPOS_RAISE5,0,0},	// S_SPOS_RAISE4
+    {SPR_SPOS,7,5,{VSLM_SpawnFire},S_SPOS_RUN1,0,0},	// S_SPOS_RAISE5
+
+    {SPR_SPOS,20,5,{VSLM_SpawnFire},S_SPOS_XRAISE2,0,0},	// S_SPOS_XRAISE1
+    {SPR_SPOS,19,5,{VSLM_SpawnFire},S_SPOS_XRAISE3,0,0},	// S_SPOS_XRAISE2
+    {SPR_SPOS,18,5,{VSLM_SpawnFire},S_SPOS_XRAISE4,0,0},	// S_SPOS_XRAISE3
+    {SPR_SPOS,17,5,{VSLM_SpawnFire},S_SPOS_XRAISE5,0,0},	// S_SPOS_XRAISE4
+    {SPR_SPOS,16,5,{VSLM_SpawnFire},S_SPOS_XRAISE6,0,0},	// S_SPOS_XRAISE5
+    {SPR_SPOS,15,5,{VSLM_SpawnFire},S_SPOS_XRAISE7,0,0},	// S_SPOS_XRAISE6
+    {SPR_SPOS,14,5,{VSLM_SpawnFire},S_SPOS_XRAISE8,0,0},	// S_SPOS_XRAISE7
+    {SPR_SPOS,13,5,{VSLM_SpawnFire},S_SPOS_XRAISE9,0,0},	// S_SPOS_XRAISE8
+	{SPR_SPOS,12,5,{VSLM_SpawnFire},S_SPOS_RUN1,0,0},	    // S_SPOS_XRAISE9
+
     {SPR_VILE,0,10,{A_Look},S_VILE_STND2,0,0},	// S_VILE_STND
     {SPR_VILE,1,10,{A_Look},S_VILE_STND,0,0},	// S_VILE_STND2
     {SPR_VILE,0,2,{A_VileChase},S_VILE_RUN2,0,0},	// S_VILE_RUN1
@@ -503,12 +527,12 @@ state_t	states[NUMSTATES] = {
     {SPR_SKEL,14,7,{A_Fall},S_SKEL_DIE5,0,0},	// S_SKEL_DIE4
     {SPR_SKEL,15,7,{NULL},S_SKEL_DIE6,0,0},	// S_SKEL_DIE5
     {SPR_SKEL,16,-1,{NULL},S_NULL,0,0},	// S_SKEL_DIE6
-    {SPR_SKEL,16,5,{NULL},S_SKEL_RAISE2,0,0},	// S_SKEL_RAISE1
-    {SPR_SKEL,15,5,{NULL},S_SKEL_RAISE3,0,0},	// S_SKEL_RAISE2
-    {SPR_SKEL,14,5,{NULL},S_SKEL_RAISE4,0,0},	// S_SKEL_RAISE3
-    {SPR_SKEL,13,5,{NULL},S_SKEL_RAISE5,0,0},	// S_SKEL_RAISE4
-    {SPR_SKEL,12,5,{NULL},S_SKEL_RAISE6,0,0},	// S_SKEL_RAISE5
-    {SPR_SKEL,11,5,{NULL},S_SKEL_RUN1,0,0},	// S_SKEL_RAISE6
+    {SPR_SKEL,16,5,{VSLM_SpawnFire},S_SKEL_RAISE2,0,0},	// S_SKEL_RAISE1
+    {SPR_SKEL,15,5,{VSLM_SpawnFire},S_SKEL_RAISE3,0,0},	// S_SKEL_RAISE2
+    {SPR_SKEL,14,5,{VSLM_SpawnFire},S_SKEL_RAISE4,0,0},	// S_SKEL_RAISE3
+    {SPR_SKEL,13,5,{VSLM_SpawnFire},S_SKEL_RAISE5,0,0},	// S_SKEL_RAISE4
+    {SPR_SKEL,12,5,{VSLM_SpawnFire},S_SKEL_RAISE6,0,0},	// S_SKEL_RAISE5
+    {SPR_SKEL,11,5,{VSLM_SpawnFire},S_SKEL_RUN1,0,0},	// S_SKEL_RAISE6
     {SPR_MANF,32768,4,{NULL},S_FATSHOT2,0,0},	// S_FATSHOT1
     {SPR_MANF,32769,4,{NULL},S_FATSHOT1,0,0},	// S_FATSHOT2
     {SPR_MISL,32769,8,{NULL},S_FATSHOTX2,0,0},	// S_FATSHOTX1
@@ -550,14 +574,14 @@ state_t	states[NUMSTATES] = {
     {SPR_FATT,17,6,{NULL},S_FATT_DIE9,0,0},	// S_FATT_DIE8
     {SPR_FATT,18,6,{NULL},S_FATT_DIE10,0,0},	// S_FATT_DIE9
     {SPR_FATT,19,-1,{A_BossDeath},S_NULL,0,0},	// S_FATT_DIE10
-    {SPR_FATT,17,5,{NULL},S_FATT_RAISE2,0,0},	// S_FATT_RAISE1
-    {SPR_FATT,16,5,{NULL},S_FATT_RAISE3,0,0},	// S_FATT_RAISE2
-    {SPR_FATT,15,5,{NULL},S_FATT_RAISE4,0,0},	// S_FATT_RAISE3
-    {SPR_FATT,14,5,{NULL},S_FATT_RAISE5,0,0},	// S_FATT_RAISE4
-    {SPR_FATT,13,5,{NULL},S_FATT_RAISE6,0,0},	// S_FATT_RAISE5
-    {SPR_FATT,12,5,{NULL},S_FATT_RAISE7,0,0},	// S_FATT_RAISE6
-    {SPR_FATT,11,5,{NULL},S_FATT_RAISE8,0,0},	// S_FATT_RAISE7
-    {SPR_FATT,10,5,{NULL},S_FATT_RUN1,0,0},	// S_FATT_RAISE8
+    {SPR_FATT,17,5,{VSLM_SpawnFire},S_FATT_RAISE2,0,0},	// S_FATT_RAISE1
+    {SPR_FATT,16,5,{VSLM_SpawnFire},S_FATT_RAISE3,0,0},	// S_FATT_RAISE2
+    {SPR_FATT,15,5,{VSLM_SpawnFire},S_FATT_RAISE4,0,0},	// S_FATT_RAISE3
+    {SPR_FATT,14,5,{VSLM_SpawnFire},S_FATT_RAISE5,0,0},	// S_FATT_RAISE4
+    {SPR_FATT,13,5,{VSLM_SpawnFire},S_FATT_RAISE6,0,0},	// S_FATT_RAISE5
+    {SPR_FATT,12,5,{VSLM_SpawnFire},S_FATT_RAISE7,0,0},	// S_FATT_RAISE6
+    {SPR_FATT,11,5,{VSLM_SpawnFire},S_FATT_RAISE8,0,0},	// S_FATT_RAISE7
+    {SPR_FATT,10,5,{VSLM_SpawnFire},S_FATT_RUN1,0,0},	// S_FATT_RAISE8
     {SPR_CPOS,0,10,{A_Look},S_CPOS_STND2,0,0},	// S_CPOS_STND
     {SPR_CPOS,1,10,{A_Look},S_CPOS_STND,0,0},	// S_CPOS_STND2
     {SPR_CPOS,0,3,{A_Chase},S_CPOS_RUN2,0,0},	// S_CPOS_RUN1
@@ -588,13 +612,21 @@ state_t	states[NUMSTATES] = {
     {SPR_CPOS,17,5,{NULL},S_CPOS_XDIE5,0,0},	// S_CPOS_XDIE4
     {SPR_CPOS,18,5,{NULL},S_CPOS_XDIE6,0,0},	// S_CPOS_XDIE5
     {SPR_CPOS,19,-1,{NULL},S_NULL,0,0},	// S_CPOS_XDIE6
-    {SPR_CPOS,13,5,{NULL},S_CPOS_RAISE2,0,0},	// S_CPOS_RAISE1
-    {SPR_CPOS,12,5,{NULL},S_CPOS_RAISE3,0,0},	// S_CPOS_RAISE2
-    {SPR_CPOS,11,5,{NULL},S_CPOS_RAISE4,0,0},	// S_CPOS_RAISE3
-    {SPR_CPOS,10,5,{NULL},S_CPOS_RAISE5,0,0},	// S_CPOS_RAISE4
-    {SPR_CPOS,9,5,{NULL},S_CPOS_RAISE6,0,0},	// S_CPOS_RAISE5
-    {SPR_CPOS,8,5,{NULL},S_CPOS_RAISE7,0,0},	// S_CPOS_RAISE6
-    {SPR_CPOS,7,5,{NULL},S_CPOS_RUN1,0,0},	// S_CPOS_RAISE7
+    {SPR_CPOS,13,5,{VSLM_SpawnFire},S_CPOS_RAISE2,0,0},	// S_CPOS_RAISE1
+    {SPR_CPOS,12,5,{VSLM_SpawnFire},S_CPOS_RAISE3,0,0},	// S_CPOS_RAISE2
+    {SPR_CPOS,11,5,{VSLM_SpawnFire},S_CPOS_RAISE4,0,0},	// S_CPOS_RAISE3
+    {SPR_CPOS,10,5,{VSLM_SpawnFire},S_CPOS_RAISE5,0,0},	// S_CPOS_RAISE4
+    {SPR_CPOS,9,5,{VSLM_SpawnFire},S_CPOS_RAISE6,0,0},	// S_CPOS_RAISE5
+    {SPR_CPOS,8,5,{VSLM_SpawnFire},S_CPOS_RAISE7,0,0},	// S_CPOS_RAISE6
+    {SPR_CPOS,7,5,{VSLM_SpawnFire},S_CPOS_RUN1,0,0},	// S_CPOS_RAISE7
+
+    {SPR_CPOS,19,5,{VSLM_SpawnFire},S_CPOS_XRAISE2,0,0},	// S_CPOS_XRAISE1
+    {SPR_CPOS,18,5,{VSLM_SpawnFire},S_CPOS_XRAISE3,0,0},	// S_CPOS_XRAISE2
+    {SPR_CPOS,17,5,{VSLM_SpawnFire},S_CPOS_XRAISE4,0,0},	// S_CPOS_XRAISE3
+    {SPR_CPOS,16,5,{VSLM_SpawnFire},S_CPOS_XRAISE5,0,0},	// S_CPOS_XRAISE4
+    {SPR_CPOS,15,5,{VSLM_SpawnFire},S_CPOS_XRAISE6,0,0},	// S_CPOS_XRAISE5
+	{SPR_CPOS,14,5,{VSLM_SpawnFire},S_CPOS_RUN1,0,0},	    // S_CPOS_XRAISE6
+
     {SPR_TROO,0,10,{A_Look},S_TROO_STND2,0,0},	// S_TROO_STND
     {SPR_TROO,1,10,{A_Look},S_TROO_STND,0,0},	// S_TROO_STND2
     {SPR_TROO,0,3,{A_Chase},S_TROO_RUN2,0,0},	// S_TROO_RUN1
@@ -623,11 +655,11 @@ state_t	states[NUMSTATES] = {
     {SPR_TROO,18,5,{NULL},S_TROO_XDIE7,0,0},	// S_TROO_XDIE6
     {SPR_TROO,19,5,{NULL},S_TROO_XDIE8,0,0},	// S_TROO_XDIE7
     {SPR_TROO,20,-1,{NULL},S_NULL,0,0},	// S_TROO_XDIE8
-    {SPR_TROO,12,8,{NULL},S_TROO_RAISE2,0,0},	// S_TROO_RAISE1
-    {SPR_TROO,11,8,{NULL},S_TROO_RAISE3,0,0},	// S_TROO_RAISE2
-    {SPR_TROO,10,6,{NULL},S_TROO_RAISE4,0,0},	// S_TROO_RAISE3
-    {SPR_TROO,9,6,{NULL},S_TROO_RAISE5,0,0},	// S_TROO_RAISE4
-    {SPR_TROO,8,6,{NULL},S_TROO_RUN1,0,0},	// S_TROO_RAISE5
+    {SPR_TROO,12,8,{VSLM_SpawnFire},S_TROO_RAISE2,0,0},	// S_TROO_RAISE1
+    {SPR_TROO,11,8,{VSLM_SpawnFire},S_TROO_RAISE3,0,0},	// S_TROO_RAISE2
+    {SPR_TROO,10,6,{VSLM_SpawnFire},S_TROO_RAISE4,0,0},	// S_TROO_RAISE3
+    {SPR_TROO,9,6,{VSLM_SpawnFire},S_TROO_RAISE5,0,0},	// S_TROO_RAISE4
+    {SPR_TROO,8,6,{VSLM_SpawnFire},S_TROO_RUN1,0,0},	// S_TROO_RAISE5
     {SPR_SARG,0,10,{A_Look},S_SARG_STND2,0,0},	// S_SARG_STND
     {SPR_SARG,1,10,{A_Look},S_SARG_STND,0,0},	// S_SARG_STND2
     {SPR_SARG,0,2,{A_Chase},S_SARG_RUN2,0,0},	// S_SARG_RUN1
@@ -649,12 +681,12 @@ state_t	states[NUMSTATES] = {
     {SPR_SARG,11,4,{A_Fall},S_SARG_DIE5,0,0},	// S_SARG_DIE4
     {SPR_SARG,12,4,{NULL},S_SARG_DIE6,0,0},	// S_SARG_DIE5
     {SPR_SARG,13,-1,{NULL},S_NULL,0,0},	// S_SARG_DIE6
-    {SPR_SARG,13,5,{NULL},S_SARG_RAISE2,0,0},	// S_SARG_RAISE1
-    {SPR_SARG,12,5,{NULL},S_SARG_RAISE3,0,0},	// S_SARG_RAISE2
-    {SPR_SARG,11,5,{NULL},S_SARG_RAISE4,0,0},	// S_SARG_RAISE3
-    {SPR_SARG,10,5,{NULL},S_SARG_RAISE5,0,0},	// S_SARG_RAISE4
-    {SPR_SARG,9,5,{NULL},S_SARG_RAISE6,0,0},	// S_SARG_RAISE5
-    {SPR_SARG,8,5,{NULL},S_SARG_RUN1,0,0},	// S_SARG_RAISE6
+    {SPR_SARG,13,5,{VSLM_SpawnFire},S_SARG_RAISE2,0,0},	// S_SARG_RAISE1
+    {SPR_SARG,12,5,{VSLM_SpawnFire},S_SARG_RAISE3,0,0},	// S_SARG_RAISE2
+    {SPR_SARG,11,5,{VSLM_SpawnFire},S_SARG_RAISE4,0,0},	// S_SARG_RAISE3
+    {SPR_SARG,10,5,{VSLM_SpawnFire},S_SARG_RAISE5,0,0},	// S_SARG_RAISE4
+    {SPR_SARG,9,5,{VSLM_SpawnFire},S_SARG_RAISE6,0,0},	// S_SARG_RAISE5
+    {SPR_SARG,8,5,{VSLM_SpawnFire},S_SARG_RUN1,0,0},	// S_SARG_RAISE6
     {SPR_HEAD,0,10,{A_Look},S_HEAD_STND,0,0},	// S_HEAD_STND
     {SPR_HEAD,0,3,{A_Chase},S_HEAD_RUN1,0,0},	// S_HEAD_RUN1
     {SPR_HEAD,1,5,{A_FaceTarget},S_HEAD_ATK2,0,0},	// S_HEAD_ATK1
@@ -669,12 +701,12 @@ state_t	states[NUMSTATES] = {
     {SPR_HEAD,9,8,{NULL},S_HEAD_DIE5,0,0},	// S_HEAD_DIE4
     {SPR_HEAD,10,8,{A_Fall},S_HEAD_DIE6,0,0},	// S_HEAD_DIE5
     {SPR_HEAD,11,-1,{NULL},S_NULL,0,0},	// S_HEAD_DIE6
-    {SPR_HEAD,11,8,{NULL},S_HEAD_RAISE2,0,0},	// S_HEAD_RAISE1
-    {SPR_HEAD,10,8,{NULL},S_HEAD_RAISE3,0,0},	// S_HEAD_RAISE2
-    {SPR_HEAD,9,8,{NULL},S_HEAD_RAISE4,0,0},	// S_HEAD_RAISE3
-    {SPR_HEAD,8,8,{NULL},S_HEAD_RAISE5,0,0},	// S_HEAD_RAISE4
-    {SPR_HEAD,7,8,{NULL},S_HEAD_RAISE6,0,0},	// S_HEAD_RAISE5
-    {SPR_HEAD,6,8,{NULL},S_HEAD_RUN1,0,0},	// S_HEAD_RAISE6
+    {SPR_HEAD,11,8,{VSLM_SpawnFire},S_HEAD_RAISE2,0,0},	// S_HEAD_RAISE1
+    {SPR_HEAD,10,8,{VSLM_SpawnFire},S_HEAD_RAISE3,0,0},	// S_HEAD_RAISE2
+    {SPR_HEAD,9,8,{VSLM_SpawnFire},S_HEAD_RAISE4,0,0},	// S_HEAD_RAISE3
+    {SPR_HEAD,8,8,{VSLM_SpawnFire},S_HEAD_RAISE5,0,0},	// S_HEAD_RAISE4
+    {SPR_HEAD,7,8,{VSLM_SpawnFire},S_HEAD_RAISE6,0,0},	// S_HEAD_RAISE5
+    {SPR_HEAD,6,8,{VSLM_SpawnFire},S_HEAD_RUN1,0,0},	// S_HEAD_RAISE6
     {SPR_BAL7,32768,4,{NULL},S_BRBALL2,0,0},	// S_BRBALL1
     {SPR_BAL7,32769,4,{NULL},S_BRBALL1,0,0},	// S_BRBALL2
     {SPR_BAL7,32770,6,{NULL},S_BRBALLX2,0,0},	// S_BRBALLX1
@@ -702,13 +734,13 @@ state_t	states[NUMSTATES] = {
     {SPR_BOSS,12,8,{NULL},S_BOSS_DIE6,0,0},	// S_BOSS_DIE5
     {SPR_BOSS,13,8,{NULL},S_BOSS_DIE7,0,0},	// S_BOSS_DIE6
     {SPR_BOSS,14,-1,{A_BossDeath},S_NULL,0,0},	// S_BOSS_DIE7
-    {SPR_BOSS,14,8,{NULL},S_BOSS_RAISE2,0,0},	// S_BOSS_RAISE1
-    {SPR_BOSS,13,8,{NULL},S_BOSS_RAISE3,0,0},	// S_BOSS_RAISE2
-    {SPR_BOSS,12,8,{NULL},S_BOSS_RAISE4,0,0},	// S_BOSS_RAISE3
-    {SPR_BOSS,11,8,{NULL},S_BOSS_RAISE5,0,0},	// S_BOSS_RAISE4
-    {SPR_BOSS,10,8,{NULL},S_BOSS_RAISE6,0,0},	// S_BOSS_RAISE5
-    {SPR_BOSS,9,8,{NULL},S_BOSS_RAISE7,0,0},	// S_BOSS_RAISE6
-    {SPR_BOSS,8,8,{NULL},S_BOSS_RUN1,0,0},	// S_BOSS_RAISE7
+    {SPR_BOSS,14,8,{VSLM_SpawnFire},S_BOSS_RAISE2,0,0},	// S_BOSS_RAISE1
+    {SPR_BOSS,13,8,{VSLM_SpawnFire},S_BOSS_RAISE3,0,0},	// S_BOSS_RAISE2
+    {SPR_BOSS,12,8,{VSLM_SpawnFire},S_BOSS_RAISE4,0,0},	// S_BOSS_RAISE3
+    {SPR_BOSS,11,8,{VSLM_SpawnFire},S_BOSS_RAISE5,0,0},	// S_BOSS_RAISE4
+    {SPR_BOSS,10,8,{VSLM_SpawnFire},S_BOSS_RAISE6,0,0},	// S_BOSS_RAISE5
+    {SPR_BOSS,9,8,{VSLM_SpawnFire},S_BOSS_RAISE7,0,0},	// S_BOSS_RAISE6
+    {SPR_BOSS,8,8,{VSLM_SpawnFire},S_BOSS_RUN1,0,0},	// S_BOSS_RAISE7
     {SPR_BOS2,0,10,{A_Look},S_BOS2_STND2,0,0},	// S_BOS2_STND
     {SPR_BOS2,1,10,{A_Look},S_BOS2_STND,0,0},	// S_BOS2_STND2
     {SPR_BOS2,0,3,{A_Chase},S_BOS2_RUN2,0,0},	// S_BOS2_RUN1
@@ -731,13 +763,13 @@ state_t	states[NUMSTATES] = {
     {SPR_BOS2,12,8,{NULL},S_BOS2_DIE6,0,0},	// S_BOS2_DIE5
     {SPR_BOS2,13,8,{NULL},S_BOS2_DIE7,0,0},	// S_BOS2_DIE6
     {SPR_BOS2,14,-1,{NULL},S_NULL,0,0},	// S_BOS2_DIE7
-    {SPR_BOS2,14,8,{NULL},S_BOS2_RAISE2,0,0},	// S_BOS2_RAISE1
-    {SPR_BOS2,13,8,{NULL},S_BOS2_RAISE3,0,0},	// S_BOS2_RAISE2
-    {SPR_BOS2,12,8,{NULL},S_BOS2_RAISE4,0,0},	// S_BOS2_RAISE3
-    {SPR_BOS2,11,8,{NULL},S_BOS2_RAISE5,0,0},	// S_BOS2_RAISE4
-    {SPR_BOS2,10,8,{NULL},S_BOS2_RAISE6,0,0},	// S_BOS2_RAISE5
-    {SPR_BOS2,9,8,{NULL},S_BOS2_RAISE7,0,0},	// S_BOS2_RAISE6
-    {SPR_BOS2,8,8,{NULL},S_BOS2_RUN1,0,0},	// S_BOS2_RAISE7
+    {SPR_BOS2,14,8,{VSLM_SpawnFire},S_BOS2_RAISE2,0,0},	// S_BOS2_RAISE1
+    {SPR_BOS2,13,8,{VSLM_SpawnFire},S_BOS2_RAISE3,0,0},	// S_BOS2_RAISE2
+    {SPR_BOS2,12,8,{VSLM_SpawnFire},S_BOS2_RAISE4,0,0},	// S_BOS2_RAISE3
+    {SPR_BOS2,11,8,{VSLM_SpawnFire},S_BOS2_RAISE5,0,0},	// S_BOS2_RAISE4
+    {SPR_BOS2,10,8,{VSLM_SpawnFire},S_BOS2_RAISE6,0,0},	// S_BOS2_RAISE5
+    {SPR_BOS2,9,8,{VSLM_SpawnFire},S_BOS2_RAISE7,0,0},	// S_BOS2_RAISE6
+    {SPR_BOS2,8,8,{VSLM_SpawnFire},S_BOS2_RUN1,0,0},	// S_BOS2_RAISE7
     {SPR_SKUL,32768,10,{A_Look},S_SKULL_STND2,0,0},	// S_SKULL_STND
     {SPR_SKUL,32769,10,{A_Look},S_SKULL_STND,0,0},	// S_SKULL_STND2
     {SPR_SKUL,32768,6,{A_Chase},S_SKULL_RUN2,0,0},	// S_SKULL_RUN1
@@ -813,13 +845,13 @@ state_t	states[NUMSTATES] = {
     {SPR_BSPI,13,7,{NULL},S_BSPI_DIE6,0,0},	// S_BSPI_DIE5
     {SPR_BSPI,14,7,{NULL},S_BSPI_DIE7,0,0},	// S_BSPI_DIE6
     {SPR_BSPI,15,-1,{A_BossDeath},S_NULL,0,0},	// S_BSPI_DIE7
-    {SPR_BSPI,15,5,{NULL},S_BSPI_RAISE2,0,0},	// S_BSPI_RAISE1
-    {SPR_BSPI,14,5,{NULL},S_BSPI_RAISE3,0,0},	// S_BSPI_RAISE2
-    {SPR_BSPI,13,5,{NULL},S_BSPI_RAISE4,0,0},	// S_BSPI_RAISE3
-    {SPR_BSPI,12,5,{NULL},S_BSPI_RAISE5,0,0},	// S_BSPI_RAISE4
-    {SPR_BSPI,11,5,{NULL},S_BSPI_RAISE6,0,0},	// S_BSPI_RAISE5
-    {SPR_BSPI,10,5,{NULL},S_BSPI_RAISE7,0,0},	// S_BSPI_RAISE6
-    {SPR_BSPI,9,5,{NULL},S_BSPI_RUN1,0,0},	// S_BSPI_RAISE7
+    {SPR_BSPI,15,5,{VSLM_SpawnFire},S_BSPI_RAISE2,0,0},	// S_BSPI_RAISE1
+    {SPR_BSPI,14,5,{VSLM_SpawnFire},S_BSPI_RAISE3,0,0},	// S_BSPI_RAISE2
+    {SPR_BSPI,13,5,{VSLM_SpawnFire},S_BSPI_RAISE4,0,0},	// S_BSPI_RAISE3
+    {SPR_BSPI,12,5,{VSLM_SpawnFire},S_BSPI_RAISE5,0,0},	// S_BSPI_RAISE4
+    {SPR_BSPI,11,5,{VSLM_SpawnFire},S_BSPI_RAISE6,0,0},	// S_BSPI_RAISE5
+    {SPR_BSPI,10,5,{VSLM_SpawnFire},S_BSPI_RAISE7,0,0},	// S_BSPI_RAISE6
+    {SPR_BSPI,9,5,{VSLM_SpawnFire},S_BSPI_RUN1,0,0},	// S_BSPI_RAISE7
     {SPR_APLS,32768,5,{NULL},S_ARACH_PLAZ2,0,0},	// S_ARACH_PLAZ
     {SPR_APLS,32769,5,{NULL},S_ARACH_PLAZ,0,0},	// S_ARACH_PLAZ2
     {SPR_APBX,32768,5,{NULL},S_ARACH_PLEX2,0,0},	// S_ARACH_PLEX
@@ -874,12 +906,12 @@ state_t	states[NUMSTATES] = {
     {SPR_PAIN,32778,8,{NULL},S_PAIN_DIE5,0,0},	// S_PAIN_DIE4
     {SPR_PAIN,32779,8,{A_PainDie},S_PAIN_DIE6,0,0},	// S_PAIN_DIE5
     {SPR_PAIN,32780,8,{NULL},S_NULL,0,0},	// S_PAIN_DIE6
-    {SPR_PAIN,12,8,{NULL},S_PAIN_RAISE2,0,0},	// S_PAIN_RAISE1
-    {SPR_PAIN,11,8,{NULL},S_PAIN_RAISE3,0,0},	// S_PAIN_RAISE2
-    {SPR_PAIN,10,8,{NULL},S_PAIN_RAISE4,0,0},	// S_PAIN_RAISE3
-    {SPR_PAIN,9,8,{NULL},S_PAIN_RAISE5,0,0},	// S_PAIN_RAISE4
-    {SPR_PAIN,8,8,{NULL},S_PAIN_RAISE6,0,0},	// S_PAIN_RAISE5
-    {SPR_PAIN,7,8,{NULL},S_PAIN_RUN1,0,0},	// S_PAIN_RAISE6
+    {SPR_PAIN,12,8,{VSLM_SpawnFire},S_PAIN_RAISE2,0,0},	// S_PAIN_RAISE1
+    {SPR_PAIN,11,8,{VSLM_SpawnFire},S_PAIN_RAISE3,0,0},	// S_PAIN_RAISE2
+    {SPR_PAIN,10,8,{VSLM_SpawnFire},S_PAIN_RAISE4,0,0},	// S_PAIN_RAISE3
+    {SPR_PAIN,9,8,{VSLM_SpawnFire},S_PAIN_RAISE5,0,0},	// S_PAIN_RAISE4
+    {SPR_PAIN,8,8,{VSLM_SpawnFire},S_PAIN_RAISE6,0,0},	// S_PAIN_RAISE5
+    {SPR_PAIN,7,8,{VSLM_SpawnFire},S_PAIN_RUN1,0,0},	// S_PAIN_RAISE6
     {SPR_SSWV,0,10,{A_Look},S_SSWV_STND2,0,0},	// S_SSWV_STND
     {SPR_SSWV,1,10,{A_Look},S_SSWV_STND,0,0},	// S_SSWV_STND2
     {SPR_SSWV,0,3,{A_Chase},S_SSWV_RUN2,0,0},	// S_SSWV_RUN1
@@ -912,11 +944,11 @@ state_t	states[NUMSTATES] = {
     {SPR_SSWV,19,5,{NULL},S_SSWV_XDIE8,0,0},	// S_SSWV_XDIE7
     {SPR_SSWV,20,5,{NULL},S_SSWV_XDIE9,0,0},	// S_SSWV_XDIE8
     {SPR_SSWV,21,-1,{NULL},S_NULL,0,0},	// S_SSWV_XDIE9
-    {SPR_SSWV,12,5,{NULL},S_SSWV_RAISE2,0,0},	// S_SSWV_RAISE1
-    {SPR_SSWV,11,5,{NULL},S_SSWV_RAISE3,0,0},	// S_SSWV_RAISE2
-    {SPR_SSWV,10,5,{NULL},S_SSWV_RAISE4,0,0},	// S_SSWV_RAISE3
-    {SPR_SSWV,9,5,{NULL},S_SSWV_RAISE5,0,0},	// S_SSWV_RAISE4
-    {SPR_SSWV,8,5,{NULL},S_SSWV_RUN1,0,0},	// S_SSWV_RAISE5
+    {SPR_SSWV,12,5,{VSLM_SpawnFire},S_SSWV_RAISE2,0,0},	// S_SSWV_RAISE1
+    {SPR_SSWV,11,5,{VSLM_SpawnFire},S_SSWV_RAISE3,0,0},	// S_SSWV_RAISE2
+    {SPR_SSWV,10,5,{VSLM_SpawnFire},S_SSWV_RAISE4,0,0},	// S_SSWV_RAISE3
+    {SPR_SSWV,9,5,{VSLM_SpawnFire},S_SSWV_RAISE5,0,0},	// S_SSWV_RAISE4
+    {SPR_SSWV,8,5,{VSLM_SpawnFire},S_SSWV_RUN1,0,0},	// S_SSWV_RAISE5
     {SPR_KEEN,0,-1,{NULL},S_KEENSTND,0,0},	// S_KEENSTND
     {SPR_KEEN,0,6,{NULL},S_COMMKEEN2,0,0},	// S_COMMKEEN
     {SPR_KEEN,1,6,{NULL},S_COMMKEEN3,0,0},	// S_COMMKEEN2
@@ -1148,12 +1180,12 @@ state_t	states[NUMSTATES] = {
     {SPR_DOGS,11,4,{A_Fall},S_DOGS_DIE5,0,0},	// S_DOGS_DIE4
     {SPR_DOGS,12,4,{NULL},S_DOGS_DIE6,0,0},	// S_DOGS_DIE5
     {SPR_DOGS,13,-1,{NULL},S_NULL,0,0},	// S_DOGS_DIE6
-    {SPR_DOGS,13,5,{NULL},S_DOGS_RAISE2,0,0},	// S_DOGS_RAISE1
-    {SPR_DOGS,12,5,{NULL},S_DOGS_RAISE3,0,0},	// S_DOGS_RAISE2
-    {SPR_DOGS,11,5,{NULL},S_DOGS_RAISE4,0,0},	// S_DOGS_RAISE3
-    {SPR_DOGS,10,5,{NULL},S_DOGS_RAISE5,0,0},	// S_DOGS_RAISE4
-    {SPR_DOGS,9,5,{NULL},S_DOGS_RAISE6,0,0},	// S_DOGS_RAISE5
-    {SPR_DOGS,8,5,{NULL},S_DOGS_RUN1,0,0},	// S_DOGS_RAISE6
+    {SPR_DOGS,13,5,{VSLM_SpawnFire},S_DOGS_RAISE2,0,0},	// S_DOGS_RAISE1
+    {SPR_DOGS,12,5,{VSLM_SpawnFire},S_DOGS_RAISE3,0,0},	// S_DOGS_RAISE2
+    {SPR_DOGS,11,5,{VSLM_SpawnFire},S_DOGS_RAISE4,0,0},	// S_DOGS_RAISE3
+    {SPR_DOGS,10,5,{VSLM_SpawnFire},S_DOGS_RAISE5,0,0},	// S_DOGS_RAISE4
+    {SPR_DOGS,9,5,{VSLM_SpawnFire},S_DOGS_RAISE6,0,0},	// S_DOGS_RAISE5
+    {SPR_DOGS,8,5,{VSLM_SpawnFire},S_DOGS_RUN1,0,0},	// S_DOGS_RAISE6
 #define BFGDELAY 1
 #define OLDBFG_1FRAMES(x) {SPR_BFGG,1,BFGDELAY,{A_FireOldBFG},x+S_OLDBFG1+2,0,0},
 #define OLDBFG_2FRAMES(x) OLDBFG_1FRAMES(x) OLDBFG_1FRAMES(x+1)
@@ -1229,7 +1261,8 @@ mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
 	0,		// damage
 	sfx_None,		// activesound
 	MF_SOLID|MF_SHOOTABLE|MF_DROPOFF|MF_PICKUP|MF_NOTDMATCH|MF_FLIPPABLE,		// flags
-	S_NULL		// raisestate
+	S_NULL,		// raisestate
+	S_NULL
     },
 
     {		// MT_POSSESSED	"ZOMBIEMAN"
@@ -1255,7 +1288,8 @@ mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
 	0,		// damage
 	sfx_posact,		// activesound
 	MF_SOLID|MF_SHOOTABLE|MF_COUNTKILL|MF_FLIPPABLE,		// flags
-	S_POSS_RAISE1		// raisestate
+	S_POSS_RAISE1,		// raisestate
+	S_POSS_XRAISE1 // xraisestate
     },
 
     {		// MT_SHOTGUY	"SHOTGUN GUY"
@@ -1281,7 +1315,8 @@ mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
 	0,		// damage
 	sfx_posact,		// activesound
 	MF_SOLID|MF_SHOOTABLE|MF_COUNTKILL|MF_FLIPPABLE,		// flags
-	S_SPOS_RAISE1		// raisestate
+	S_SPOS_RAISE1,		// raisestate
+	S_SPOS_XRAISE1
     },
 
     {		// MT_VILE	"ARCH-VILE"
@@ -1307,7 +1342,8 @@ mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
 	0,		// damage
 	sfx_vilact,		// activesound
 	MF_SOLID|MF_SHOOTABLE|MF_COUNTKILL|MF_FLIPPABLE,		// flags
-	S_NULL		// raisestate
+	S_NULL,		// raisestate
+	S_NULL
     },
 
     {		// MT_FIRE
@@ -1333,7 +1369,8 @@ mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
 	0,		// damage
 	sfx_None,		// activesound
 	MF_NOBLOCKMAP|MF_NOGRAVITY|MF_TRANSLUCENT,		// flags
-	S_NULL		// raisestate
+	S_NULL,		// raisestate
+	S_NULL
     },
 
     {		// MT_UNDEAD	"REVENANT"
@@ -1359,7 +1396,8 @@ mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
 	0,		// damage
 	sfx_skeact,		// activesound
 	MF_SOLID|MF_SHOOTABLE|MF_COUNTKILL|MF_FLIPPABLE,		// flags
-	S_SKEL_RAISE1		// raisestate
+	S_SKEL_RAISE1,		// raisestate
+	S_NULL
     },
 
     {		// MT_TRACER
@@ -1385,7 +1423,8 @@ mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
 	10,		// damage
 	sfx_None,		// activesound
 	MF_NOBLOCKMAP|MF_MISSILE|MF_DROPOFF|MF_NOGRAVITY,		// flags
-	S_NULL		// raisestate
+	S_NULL,		// raisestate
+	S_NULL
     },
 
     {		// MT_SMOKE
@@ -1411,7 +1450,8 @@ mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
 	0,		// damage
 	sfx_None,		// activesound
 	MF_NOBLOCKMAP|MF_NOGRAVITY|MF_TRANSLUCENT,		// flags
-	S_NULL		// raisestate
+	S_NULL,		// raisestate
+	S_NULL
     },
 
     {		// MT_FATSO	"MANCUBUS"
@@ -1437,7 +1477,8 @@ mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
 	0,		// damage
 	sfx_posact,		// activesound
 	MF_SOLID|MF_SHOOTABLE|MF_COUNTKILL|MF_FLIPPABLE,		// flags
-	S_FATT_RAISE1		// raisestate
+	S_FATT_RAISE1,		// raisestate
+	S_NULL
     },
 
     {		// MT_FATSHOT
@@ -1463,7 +1504,8 @@ mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
 	8,		// damage
 	sfx_None,		// activesound
 	MF_NOBLOCKMAP|MF_MISSILE|MF_DROPOFF|MF_NOGRAVITY|MF_TRANSLUCENT,		// flags
-	S_NULL		// raisestate
+	S_NULL,		// raisestate
+	S_NULL
     },
 
     {		// MT_CHAINGUY	"HEAVY WEAPON DUDE"
@@ -1489,7 +1531,8 @@ mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
 	0,		// damage
 	sfx_posact,		// activesound
 	MF_SOLID|MF_SHOOTABLE|MF_COUNTKILL|MF_FLIPPABLE,		// flags
-	S_CPOS_RAISE1		// raisestate
+	S_CPOS_RAISE1,		// raisestate
+	S_CPOS_XRAISE1
     },
 
     {		// MT_TROOP	"IMP"
@@ -1515,7 +1558,8 @@ mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
 	0,		// damage
 	sfx_bgact,		// activesound
 	MF_SOLID|MF_SHOOTABLE|MF_COUNTKILL|MF_FLIPPABLE,		// flags
-	S_TROO_RAISE1		// raisestate
+	S_TROO_RAISE1,		// raisestate
+	S_NULL
     },
 
     {		// MT_SERGEANT	"DEMON"
@@ -1541,7 +1585,8 @@ mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
 	0,		// damage
 	sfx_dmact,		// activesound
 	MF_SOLID|MF_SHOOTABLE|MF_COUNTKILL|MF_FLIPPABLE,		// flags
-	S_SARG_RAISE1		// raisestate
+	S_SARG_RAISE1,		// raisestate
+	S_NULL
     },
 
     {		// MT_SHADOWS
@@ -1567,7 +1612,8 @@ mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
 	0,		// damage
 	sfx_dmact,		// activesound
 	MF_SOLID|MF_SHOOTABLE|MF_SHADOW|MF_COUNTKILL|MF_FLIPPABLE,		// flags
-	S_SARG_RAISE1		// raisestate
+	S_SARG_RAISE1,		// raisestate
+	S_NULL
     },
 
     {		// MT_HEAD	"CACODEMON"
@@ -1593,7 +1639,8 @@ mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
 	0,		// damage
 	sfx_dmact,		// activesound
 	MF_SOLID|MF_SHOOTABLE|MF_FLOAT|MF_NOGRAVITY|MF_COUNTKILL|MF_FLIPPABLE,		// flags
-	S_HEAD_RAISE1		// raisestate
+	S_HEAD_RAISE1,		// raisestate
+	S_NULL
     },
 
     {		// MT_BRUISER	"BARON OF HELL"
@@ -1619,7 +1666,8 @@ mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
 	0,		// damage
 	sfx_dmact,		// activesound
 	MF_SOLID|MF_SHOOTABLE|MF_COUNTKILL|MF_FLIPPABLE,		// flags
-	S_BOSS_RAISE1		// raisestate
+	S_BOSS_RAISE1,		// raisestate
+	S_NULL // xraisestate
     },
 
     {		// MT_BRUISERSHOT
@@ -1645,7 +1693,8 @@ mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
 	8,		// damage
 	sfx_None,		// activesound
 	MF_NOBLOCKMAP|MF_MISSILE|MF_DROPOFF|MF_NOGRAVITY|MF_TRANSLUCENT,		// flags
-	S_NULL		// raisestate
+	S_NULL,		// raisestate
+	S_NULL // xraisestate
     },
 
     {		// MT_KNIGHT	"HELL KNIGHT"
@@ -1671,7 +1720,8 @@ mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
 	0,		// damage
 	sfx_dmact,		// activesound
 	MF_SOLID|MF_SHOOTABLE|MF_COUNTKILL|MF_FLIPPABLE,		// flags
-	S_BOS2_RAISE1		// raisestate
+	S_BOS2_RAISE1,		// raisestate
+	S_NULL // xraisestate
     },
 
     {		// MT_SKULL	"LOST SOUL"
@@ -1697,7 +1747,8 @@ mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
 	3,		// damage
 	sfx_dmact,		// activesound
 	MF_SOLID|MF_SHOOTABLE|MF_FLOAT|MF_NOGRAVITY|MF_FLIPPABLE,		// flags
-	S_NULL		// raisestate
+	S_NULL,		// raisestate
+	S_NULL // xraisestate
     },
 
     {		// MT_SPIDER	"THE SPIDER MASTERMIND"
@@ -1723,7 +1774,8 @@ mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
 	0,		// damage
 	sfx_dmact,		// activesound
 	MF_SOLID|MF_SHOOTABLE|MF_COUNTKILL|MF_FLIPPABLE,		// flags
-	S_NULL		// raisestate
+	S_NULL,		// raisestate
+	S_NULL // xraisestate
     },
 
     {		// MT_BABY	"ARACHNOTRON"
@@ -1749,7 +1801,8 @@ mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
 	0,		// damage
 	sfx_bspact,		// activesound
 	MF_SOLID|MF_SHOOTABLE|MF_COUNTKILL|MF_FLIPPABLE,		// flags
-	S_BSPI_RAISE1		// raisestate
+	S_BSPI_RAISE1,		// raisestate
+	S_NULL // xraisestate
     },
 
     {		// MT_CYBORG	"THE CYBERDEMON"
@@ -1775,7 +1828,8 @@ mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
 	0,		// damage
 	sfx_dmact,		// activesound
 	MF_SOLID|MF_SHOOTABLE|MF_COUNTKILL,		// flags
-	S_NULL		// raisestate
+	S_NULL,		// raisestate
+	S_NULL // xraisestate
     },
 
     {		// MT_PAIN	"PAIN ELEMENTAL"
@@ -1801,7 +1855,8 @@ mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
 	0,		// damage
 	sfx_dmact,		// activesound
 	MF_SOLID|MF_SHOOTABLE|MF_FLOAT|MF_NOGRAVITY|MF_COUNTKILL|MF_FLIPPABLE,		// flags
-	S_PAIN_RAISE1		// raisestate
+	S_PAIN_RAISE1,		// raisestate
+	S_NULL // xraisestate
     },
 
     {		// MT_WOLFSS
@@ -1827,7 +1882,8 @@ mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
 	0,		// damage
 	sfx_posact,		// activesound
 	MF_SOLID|MF_SHOOTABLE|MF_COUNTKILL|MF_FLIPPABLE,		// flags
-	S_SSWV_RAISE1		// raisestate
+	S_SSWV_RAISE1,		// raisestate
+	S_NULL // xraisestate
     },
 
     {		// MT_KEEN
@@ -1853,7 +1909,8 @@ mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
 	0,		// damage
 	sfx_None,		// activesound
 	MF_SOLID|MF_SPAWNCEILING|MF_NOGRAVITY|MF_SHOOTABLE|MF_COUNTKILL|MF_FLIPPABLE,		// flags
-	S_NULL		// raisestate
+	S_NULL,		// raisestate
+	S_NULL // xraisestate
     },
 
     {		// MT_BOSSBRAIN
@@ -1879,7 +1936,8 @@ mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
 	0,		// damage
 	sfx_None,		// activesound
 	MF_SOLID|MF_SHOOTABLE,		// flags
-	S_NULL		// raisestate
+	S_NULL,		// raisestate
+	S_NULL // xraisestate
     },
 
     {		// MT_BOSSSPIT
@@ -1905,7 +1963,8 @@ mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
 	0,		// damage
 	sfx_None,		// activesound
 	MF_NOBLOCKMAP|MF_NOSECTOR,		// flags
-	S_NULL		// raisestate
+	S_NULL,		// raisestate
+	S_NULL // xraisestate
     },
 
     {		// MT_BOSSTARGET
@@ -1931,7 +1990,8 @@ mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
 	0,		// damage
 	sfx_None,		// activesound
 	MF_NOBLOCKMAP|MF_NOSECTOR,		// flags
-	S_NULL		// raisestate
+	S_NULL,		// raisestate
+	S_NULL // xraisestate
     },
 
     {		// MT_SPAWNSHOT
@@ -1957,7 +2017,8 @@ mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
 	3,		// damage
 	sfx_None,		// activesound
 	MF_NOBLOCKMAP|MF_MISSILE|MF_DROPOFF|MF_NOGRAVITY|MF_NOCLIP,		// flags
-	S_NULL		// raisestate
+	S_NULL,		// raisestate
+	S_NULL // xraisestate
     },
 
     {		// MT_SPAWNFIRE
@@ -1983,7 +2044,8 @@ mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
 	0,		// damage
 	sfx_None,		// activesound
 	MF_NOBLOCKMAP|MF_NOGRAVITY|MF_TRANSLUCENT,		// flags
-	S_NULL		// raisestate
+	S_NULL,		// raisestate
+	S_NULL // xraisestate
     },
 
     {		// MT_BARREL
@@ -2009,7 +2071,8 @@ mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
 	0,		// damage
 	sfx_None,		// activesound
 	MF_SOLID|MF_SHOOTABLE|MF_NOBLOOD,		// flags
-	S_NULL		// raisestate
+	S_NULL,		// raisestate
+	S_NULL // xraisestate
     },
 
     {		// MT_TROOPSHOT
@@ -2035,7 +2098,8 @@ mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
 	3,		// damage
 	sfx_None,		// activesound
 	MF_NOBLOCKMAP|MF_MISSILE|MF_DROPOFF|MF_NOGRAVITY|MF_TRANSLUCENT,		// flags
-	S_NULL		// raisestate
+	S_NULL,		// raisestate
+	S_NULL // xraisestate
     },
 
     {		// MT_HEADSHOT
@@ -2061,7 +2125,8 @@ mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
 	5,		// damage
 	sfx_None,		// activesound
 	MF_NOBLOCKMAP|MF_MISSILE|MF_DROPOFF|MF_NOGRAVITY|MF_TRANSLUCENT,		// flags
-	S_NULL		// raisestate
+	S_NULL,		// raisestate
+	S_NULL // xraisestate
     },
 
     {		// MT_ROCKET
@@ -2087,7 +2152,8 @@ mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
 	20,		// damage
 	sfx_None,		// activesound
 	MF_NOBLOCKMAP|MF_MISSILE|MF_DROPOFF|MF_NOGRAVITY,		// flags
-	S_NULL		// raisestate
+	S_NULL,		// raisestate
+	S_NULL // xraisestate
     },
 
     {		// MT_PLASMA
@@ -2113,7 +2179,8 @@ mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
 	5,		// damage
 	sfx_None,		// activesound
 	MF_NOBLOCKMAP|MF_MISSILE|MF_DROPOFF|MF_NOGRAVITY|MF_TRANSLUCENT,		// flags
-	S_NULL		// raisestate
+	S_NULL,		// raisestate
+	S_NULL // xraisestate
     },
 
     {		// MT_BFG
@@ -2139,7 +2206,8 @@ mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
 	100,		// damage
 	sfx_None,		// activesound
 	MF_NOBLOCKMAP|MF_MISSILE|MF_DROPOFF|MF_NOGRAVITY|MF_TRANSLUCENT,		// flags
-	S_NULL		// raisestate
+	S_NULL,		// raisestate
+	S_NULL // xraisestate
     },
 
     {		// MT_ARACHPLAZ
@@ -2165,7 +2233,8 @@ mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
 	5,		// damage
 	sfx_None,		// activesound
 	MF_NOBLOCKMAP|MF_MISSILE|MF_DROPOFF|MF_NOGRAVITY|MF_TRANSLUCENT,		// flags
-	S_NULL		// raisestate
+	S_NULL,		// raisestate
+	S_NULL // xraisestate
     },
 
     {		// MT_PUFF
@@ -2191,7 +2260,8 @@ mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
 	0,		// damage
 	sfx_None,		// activesound
 	MF_NOBLOCKMAP|MF_NOGRAVITY|MF_FLIPPABLE|MF_TRANSLUCENT,		// flags
-	S_NULL		// raisestate
+	S_NULL,		// raisestate
+	S_NULL // xraisestate
     },
 
     {		// MT_BLOOD
@@ -2217,7 +2287,8 @@ mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
 	0,		// damage
 	sfx_None,		// activesound
 	MF_NOBLOCKMAP|MF_FLIPPABLE,		// flags
-	S_NULL		// raisestate
+	S_NULL,		// raisestate
+	S_NULL // xraisestate
     },
 
     {		// MT_TFOG
@@ -2243,7 +2314,8 @@ mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
 	0,		// damage
 	sfx_None,		// activesound
 	MF_NOBLOCKMAP|MF_NOGRAVITY|MF_TRANSLUCENT,		// flags
-	S_NULL		// raisestate
+	S_NULL,		// raisestate
+	S_NULL // xraisestate
     },
 
     {		// MT_IFOG
@@ -2269,7 +2341,8 @@ mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
 	0,		// damage
 	sfx_None,		// activesound
 	MF_NOBLOCKMAP|MF_NOGRAVITY|MF_TRANSLUCENT,		// flags
-	S_NULL		// raisestate
+	S_NULL,		// raisestate
+	S_NULL // xraisestate
     },
 
     {		// MT_TELEPORTMAN
@@ -2295,7 +2368,8 @@ mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
 	0,		// damage
 	sfx_None,		// activesound
 	MF_NOBLOCKMAP|MF_NOSECTOR,		// flags
-	S_NULL		// raisestate
+	S_NULL,		// raisestate
+	S_NULL // xraisestate
     },
 
     {		// MT_EXTRABFG
@@ -2321,7 +2395,8 @@ mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
 	0,		// damage
 	sfx_None,		// activesound
 	MF_NOBLOCKMAP|MF_NOGRAVITY|MF_TRANSLUCENT,		// flags
-	S_NULL		// raisestate
+	S_NULL,		// raisestate
+	S_NULL // xraisestate
     },
 
     {		// MT_MISC0

@@ -22,7 +22,12 @@
 
 #ifndef __P_SPEC__
 #define __P_SPEC__
+#include "d_think.h"
+#include "r_defs.h"
+#include "doomtype.h"
 
+// Forward declarations
+typedef struct player_s player_t;
 
 //
 // End-level timer (-TIMER option)

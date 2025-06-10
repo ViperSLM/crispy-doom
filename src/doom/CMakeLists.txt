@@ -1,3 +1,5 @@
+set(VSLM_UTIL vslm.c)
+
 add_library(doom STATIC
             am_map.c        am_map.h
             deh_ammo.c
@@ -79,7 +81,8 @@ add_library(doom STATIC
             st_lib.c        st_lib.h
             st_stuff.c      st_stuff.h
             v_snow.c        v_snow.h
-            wi_stuff.c      wi_stuff.h)
+            wi_stuff.c      wi_stuff.h
+            ${VSLM_UTIL})
 
 target_include_directories(doom PRIVATE "../" "${CMAKE_CURRENT_BINARY_DIR}/../../")
 target_link_libraries(doom SDL2::SDL2)

@@ -397,6 +397,17 @@ typedef enum
     S_POSS_RAISE2,
     S_POSS_RAISE3,
     S_POSS_RAISE4,
+
+    S_POSS_XRAISE1,
+    S_POSS_XRAISE2,
+    S_POSS_XRAISE3,
+    S_POSS_XRAISE4,
+    S_POSS_XRAISE5,
+    S_POSS_XRAISE6,
+    S_POSS_XRAISE7,
+    S_POSS_XRAISE8,
+    S_POSS_XRAISE9,
+
     S_SPOS_STND,
     S_SPOS_STND2,
     S_SPOS_RUN1,
@@ -431,6 +442,17 @@ typedef enum
     S_SPOS_RAISE3,
     S_SPOS_RAISE4,
     S_SPOS_RAISE5,
+
+    S_SPOS_XRAISE1,
+    S_SPOS_XRAISE2,
+    S_SPOS_XRAISE3,
+    S_SPOS_XRAISE4,
+    S_SPOS_XRAISE5,
+    S_SPOS_XRAISE6,
+    S_SPOS_XRAISE7,
+    S_SPOS_XRAISE8,
+    S_SPOS_XRAISE9,
+
     S_VILE_STND,
     S_VILE_STND2,
     S_VILE_RUN1,
@@ -632,6 +654,14 @@ typedef enum
     S_CPOS_RAISE5,
     S_CPOS_RAISE6,
     S_CPOS_RAISE7,
+
+    S_CPOS_XRAISE1,
+    S_CPOS_XRAISE2,
+    S_CPOS_XRAISE3,
+    S_CPOS_XRAISE4,
+    S_CPOS_XRAISE5,
+    S_CPOS_XRAISE6,
+
     S_TROO_STND,
     S_TROO_STND2,
     S_TROO_RUN1,
@@ -1447,6 +1477,7 @@ typedef struct
     int	activesound;
     int	flags;
     int	raisestate;
+    int xraisestate;
     // [crispy] height of the spawnstate's first sprite in pixels
     int	actualheight;
     // [crispy] mobj to drop after death
