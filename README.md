@@ -9,6 +9,10 @@ This branch is based on the 7.0 release of [Crispy Doom](https://github.com/fabi
   and also adds a new state into the mobjinfo_t struct (xraisestate) which reverses
   the gibbing animation if the monster being revived was gibbed.
 
+  The old respawn function can still be used by appending *-compatrespawn* to the
+  command line which reverts this change back to the original P_NightmareSpawn
+  function.
+
 * Tag 666/667 events are stored inside of it's own function (VSLM_TriggerTag666)
 
 All new functions added are inside of it's own source file (vslm.c) and are called
