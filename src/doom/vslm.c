@@ -98,7 +98,7 @@ void VSLM_TriggerTag666(boolean tag667)
 
     switch (gamemode)
     {
-        // DOOM/Ultimate DOOM (including the Sharware version)
+        // DOOM/Ultimate DOOM (including the Shareware version)
         case shareware:
         case registered:
         case retail:

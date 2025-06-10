@@ -37,6 +37,8 @@
 
 #include "doomstat.h"
 
+extern int M_CheckParm (const char* check);
+
 // New respawn function
 extern void VSLM_RespawnMonster(mobj_t *actor);
 
@@ -637,10 +639,14 @@ void P_MobjThinker (mobj_t* mobj)
 	if (P_Random () > 4)
 	    return;
 
-	//P_NightmareRespawn (mobj);
+    // Revert back to old respawn function (compatibility)
+    if (M_CheckParm("-compatrespawn"))
+    {
+        P_NightmareRespawn (mobj);
+        return;
+    }
     VSLM_RespawnMonster(mobj);
     }
-
 }
 
 

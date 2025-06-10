@@ -29,8 +29,6 @@
 
 #include "s_sound.h"
 
-#include "g_game.h"
-
 // State.
 #include "doomstat.h"
 #include "r_state.h"
