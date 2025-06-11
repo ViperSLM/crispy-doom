@@ -2,6 +2,19 @@ foreach(SUBDIR doom heretic hexen strife setup)
     add_subdirectory("${SUBDIR}")
 endforeach()
 
+option(ENABLE_LUA "Enable Lua scripting language support for Crispy Doom" OFF)
+set(LUA_SOURCE_FILES)
+
+if(${ENABLE_LUA})
+    set(LUAJIT_INCLUDE_DIR "" CACHE PATH "Include directory for LuaJIT")
+    set(LUAJIT_LIBRARY "" CACHE FILEPATH "Library file path for LuaJIT")
+    set(LUA_SOURCE_FILES
+        i_lua.c             i_lua.h
+    )
+    include_directories(${LUAJIT_INCLUDE_DIR})
+    add_compile_definitions(LUA_ENABLED)
+endif()
+
 # Common source files used by absolutely everything:
 
 set(COMMON_SOURCE_FILES
@@ -9,7 +22,8 @@ set(COMMON_SOURCE_FILES
     i_main.c
     i_system.c           i_system.h
     m_argv.c             m_argv.h
-    m_misc.c             m_misc.h)
+    m_misc.c             m_misc.h
+)
 
 # Dedicated server (chocolate-server):
 
@@ -126,10 +140,10 @@ set(DEHACKED_SOURCE_FILES
 
 # Some games support dehacked patches, some don't:
 
-set(SOURCE_FILES ${COMMON_SOURCE_FILES} ${GAME_SOURCE_FILES})
+set(SOURCE_FILES ${COMMON_SOURCE_FILES} ${GAME_SOURCE_FILES} ${LUA_SOURCE_FILES})
 set(SOURCE_FILES_WITH_DEH ${SOURCE_FILES} ${DEHACKED_SOURCE_FILES})
 
-set(EXTRA_LIBS SDL2::SDL2main SDL2::SDL2 textscreen pcsound opl)
+set(EXTRA_LIBS SDL2::SDL2main SDL2::SDL2 textscreen pcsound opl ${LUAJIT_LIBRARY})
 if(ENABLE_SDL2_MIXER)
     list(APPEND EXTRA_LIBS SDL2_mixer::SDL2_mixer)
 endif()
@@ -155,7 +169,7 @@ else()
     add_executable("${PROGRAM_PREFIX}doom" ${SOURCE_FILES_WITH_DEH})
 endif()
 
-target_include_directories("${PROGRAM_PREFIX}doom" PRIVATE ${GAME_INCLUDE_DIRS})
+target_include_directories("${PROGRAM_PREFIX}doom" PRIVATE ${GAME_INCLUDE_DIRS} ${LUAJIT_INCLUDE_DIR})
 target_link_libraries("${PROGRAM_PREFIX}doom" doom ${EXTRA_LIBS})
 
 if(MSVC)
@@ -169,7 +183,7 @@ else()
     add_executable("${PROGRAM_PREFIX}heretic" ${SOURCE_FILES_WITH_DEH})
 endif()
 
-target_include_directories("${PROGRAM_PREFIX}heretic" PRIVATE ${GAME_INCLUDE_DIRS})
+target_include_directories("${PROGRAM_PREFIX}heretic" PRIVATE ${GAME_INCLUDE_DIRS} ${LUAJIT_INCLUDE_DIR})
 target_link_libraries("${PROGRAM_PREFIX}heretic" heretic ${EXTRA_LIBS})
 
 if(MSVC)
@@ -183,7 +197,8 @@ else()
     add_executable("${PROGRAM_PREFIX}hexen" ${SOURCE_FILES})
 endif()
 
-target_include_directories("${PROGRAM_PREFIX}hexen" PRIVATE ${GAME_INCLUDE_DIRS})
+# Integrating Lua with Hexen feels rather pointless because of ACS
+target_include_directories("${PROGRAM_PREFIX}hexen" PRIVATE ${GAME_INCLUDE_DIRS} ${LUAJIT_INCLUDE_DIR})
 target_link_libraries("${PROGRAM_PREFIX}hexen" hexen ${EXTRA_LIBS})
 
 if(MSVC)
@@ -197,7 +212,7 @@ else()
     add_executable("${PROGRAM_PREFIX}strife" ${SOURCE_FILES_WITH_DEH})
 endif()
 
-target_include_directories("${PROGRAM_PREFIX}strife" PRIVATE ${GAME_INCLUDE_DIRS})
+target_include_directories("${PROGRAM_PREFIX}strife" PRIVATE ${GAME_INCLUDE_DIRS} ${LUAJIT_INCLUDE_DIR})
 target_link_libraries("${PROGRAM_PREFIX}strife" strife ${EXTRA_LIBS})
 
 if(MSVC)

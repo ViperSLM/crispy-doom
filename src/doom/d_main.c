@@ -32,6 +32,7 @@
 #include "doomstat.h"
 
 #include "dstrings.h"
+#include "i_lua.h"
 #include "sounds.h"
 
 #include "d_iwad.h"
@@ -1643,6 +1644,9 @@ void D_DoomMain (void)
     // init subsystems
     DEH_printf("V_Init: allocate screens.\n");
     V_Init ();
+
+    // Start Lua
+    I_InitLua();
 
     // Load configuration files before initialising other subsystems.
     DEH_printf("M_LoadDefaults: Load system defaults.\n");
