@@ -82,9 +82,9 @@ add_library(doom STATIC
             st_stuff.c      st_stuff.h
             v_snow.c        v_snow.h
             wi_stuff.c      wi_stuff.h
-            ${VSLM_UTIL})
+            ${VSLM_UTIL}    l_doom.c )
 
-target_include_directories(doom PRIVATE "../" "${CMAKE_CURRENT_BINARY_DIR}/../../")
+target_include_directories(doom PRIVATE "../" "${CMAKE_CURRENT_BINARY_DIR}/../../" ${LUAJIT_INCLUDE_DIR})
 target_link_libraries(doom SDL2::SDL2)
 if(ENABLE_SDL2_MIXER)
     target_link_libraries(doom SDL2_mixer::SDL2_mixer)

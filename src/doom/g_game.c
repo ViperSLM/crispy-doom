@@ -81,7 +81,13 @@
 #include "deh_main.h" // [crispy] for demo footer
 #include "memio.h"
 
+// ViperSLM: Lua scripting
+#include "i_lua.h"
+#include <luajit.h>
+
 #define SAVEGAMESIZE	0x2c000
+
+extern const char *VSLM_GetCurrentMap(void);
 
 void	G_ReadDemoTiccmd (ticcmd_t* cmd); 
 void	G_WriteDemoTiccmd (ticcmd_t* cmd); 
@@ -95,7 +101,11 @@ void	G_DoCompleted (void);
 void	G_DoVictory (void); 
 void	G_DoWorldDone (void); 
 void	G_DoSaveGame (void); 
- 
+
+// Map script which gets loaded from a WAD file, if there is one
+char mapScriptName[8];
+char *mapscript;
+
 // Gamestate the last time G_Ticker was called.
 
 gamestate_t     oldgamestate; 
@@ -984,7 +994,7 @@ void G_BuildTiccmd (ticcmd_t* cmd, int maketic)
 //
 void G_DoLoadLevel (void) 
 { 
-    int             i; 
+    int             i;
 
     // Set the sky map.
     // First thing, we have a dummy sky texture name,
@@ -1111,6 +1121,8 @@ void G_DoLoadLevel (void)
     {
         players[consoleplayer].message = "Press escape to quit.";
     }
+
+    L_LoadMapScriptFromWAD(maplumpinfo->name);
 } 
 
 static void SetJoyButtons(unsigned int buttons_mask)

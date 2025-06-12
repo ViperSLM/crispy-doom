@@ -35,6 +35,8 @@ extern void S_StartSound(void *origin, int sound_id);
 extern void G_ExitLevel(void);
 extern void ST_PrintMsg(const char *format, ...);
 extern int M_CheckParm(const char *check);
+extern int M_vsnprintf(char *buf, size_t buf_len, const char *s, va_list args);
+extern int M_snprintf(char *buf, size_t buf_len, const char *s, ...);
 extern boolean P_CheckPosition(mobj_t * thing, fixed_t x, fixed_t y);
 extern subsector_t *R_PointInSubsector(fixed_t x, fixed_t y);
 
@@ -47,6 +49,12 @@ void VSLM_ToggleInvisMonsters(boolean *outInvisFlag);
 void VSLM_TriggerTag666(boolean tag667);
 boolean VSLM_IsMonster(mobj_t *actor);
 boolean VSLM_IsMonsterGibbed(mobj_t *actor);
+
+char mapName[5];
+
+// Gets the name of the current map.
+// Returns NULL if no map is loaded
+const char *VSLM_GetCurrentMap(void);
 // ----------------------------------------
 
 // Message buffer
@@ -413,6 +421,31 @@ boolean VSLM_IsMonsterGibbed(mobj_t *actor)
         }
     }
     return false;
+}
+
+const char *VSLM_GetCurrentMap(void)
+{
+    switch (gamemode)
+    {
+        // DOOM/Ultimate DOOM
+        case shareware:
+        case registered:
+        case retail:
+            M_snprintf(mapName, sizeof(mapName), "E%dM%d", gameepisode,
+                       gamemap);
+            break;
+
+        // DOOM II
+        case commercial:
+            M_snprintf(mapName, sizeof(mapName), "%s%d",
+                       (gamemap < 10) ? "MAP0" : "MAP", gamemap);
+            break;
+
+        default:
+            // Unknown game, return blank
+            return "";
+    }
+    return mapName;
 }
 
 // May or may not be pointless

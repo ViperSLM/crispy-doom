@@ -32,7 +32,6 @@
 #include "doomstat.h"
 
 #include "dstrings.h"
-#include "i_lua.h"
 #include "sounds.h"
 
 #include "d_iwad.h"
@@ -81,6 +80,10 @@
 #include "d_main.h"
 
 #include "doom_icon.c"
+
+// Lua bindings
+#include "i_lua.h"
+extern int luaopen_doom(lua_State *L);
 
 //
 // D-DoomLoop()
@@ -1645,9 +1648,6 @@ void D_DoomMain (void)
     DEH_printf("V_Init: allocate screens.\n");
     V_Init ();
 
-    // Start Lua
-    I_InitLua();
-
     // Load configuration files before initialising other subsystems.
     DEH_printf("M_LoadDefaults: Load system defaults.\n");
     M_SetConfigFilenames("default.cfg", PROGRAM_PREFIX "doom.cfg");
@@ -2123,6 +2123,12 @@ void D_DoomMain (void)
     I_InitJoystick();
     I_InitSound(doom);
     I_InitMusic();
+    
+    // Start Lua
+    I_InitLua();
+
+    // Load Doom bindings
+    L_LoadLib(luaopen_doom);
 
     // [crispy] check for SSG resources
     crispy->havessg =

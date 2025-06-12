@@ -11,7 +11,7 @@ set(top_builddir ${CMAKE_CURRENT_BINARY_DIR})
 set(PACKAGE_NAME "${PROJECT_NAME}")
 set(PACKAGE_TARNAME "crispy-doom")
 set(PACKAGE_VERSION "${PROJECT_VERSION}")
-set(PACKAGE_STRING "${PROJECT_NAME} ${PROJECT_VERSION}")
+set(PACKAGE_STRING "${PROJECT_NAME} ${PROJECT_VERSION} - ViperSLM's Fork")
 set(PACKAGE_BUGREPORT "https://github.com/fabiangreffrath/crispy-doom/issues")
 
 string(REGEX REPLACE " Doom$" "" PACKAGE_SHORTNAME "${PACKAGE_NAME}")

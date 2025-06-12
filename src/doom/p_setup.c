@@ -45,6 +45,8 @@
 
 #include "p_extnodes.h" // [crispy] support extended node formats
 
+#include "i_lua.h"
+
 void	P_SpawnMapThing (mapthing_t*	mthing);
 
 
@@ -1111,6 +1113,8 @@ int P_GetNumForMap (int episode, int map, boolean critical)
 // pointer to the current map lump info struct
 lumpinfo_t *maplumpinfo;
 
+char *scriptlump;
+
 //
 // P_SetupLevel
 //
@@ -1126,7 +1130,8 @@ P_SetupLevel
     int		lumpnum;
     boolean	crispy_validblockmap;
     mapformat_t	crispy_mapformat;
-	
+	char scriptname[2+sizeof(lumpname)];
+
     totalkills = totalitems = totalsecret = wminfo.maxfrags = 0;
     // [crispy] count spawned monsters
     extrakills = 0;
@@ -1329,6 +1334,20 @@ P_SetupLevel
 
     //printf ("free memory: 0x%x\n", Z_FreeMemory());
 
+    /*
+    // Load Lua script for specified map and run OnMapLoad()
+    M_snprintf(mapScriptName, sizeof(mapScriptName), "L_%s", VSLM_GetCurrentMap());
+    if (W_GetNumForName(mapScriptName) != -1)
+    {
+        DEH_printf("Lua script lump '%s' found!\n", mapScriptName);
+
+        if(M_CheckParm("-vslmdebug"))
+        {
+            DEH_printf("[VSLM DEBUG] Contents of map script:\n%s", mapscript);
+        }
+    }
+    // mapscript = W_CacheLumpName("");
+    */
 }
 
 
