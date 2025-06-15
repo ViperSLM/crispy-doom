@@ -4,7 +4,6 @@ endforeach()
 
 option(ENABLE_LUA "Enable Lua scripting language support for Crispy Doom" OFF)
 set(LUA_SOURCE_FILES)
-set(LUA_SOURCE_FILES_DOOM)
 
 if(${ENABLE_LUA})
     set(LUAJIT_INCLUDE_DIR "" CACHE PATH "Include directory for LuaJIT")
