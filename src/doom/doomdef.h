@@ -168,4 +168,7 @@ typedef enum
     
 } powerduration_t;
 
+// Special type limits (linedefs, sectors)
+#define LINEDEF_LIMIT 142
+
 #endif          // __DOOMDEF__

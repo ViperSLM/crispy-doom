@@ -50,6 +50,9 @@
 // Data.
 #include "sounds.h"
 
+// ViperSLM: Lua stuff
+#include "i_lua.h"
+
 #define HUSTR_SECRETFOUND	"A secret is revealed!"
 
 //

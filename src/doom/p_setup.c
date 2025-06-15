@@ -581,7 +581,7 @@ void P_LoadLineDefs (int lump)
 	ld->flags = (unsigned short)SHORT(mld->flags); // [crispy] extended nodes
 	ld->special = SHORT(mld->special);
 	// [crispy] warn about unknown linedef types
-	if ((unsigned short) ld->special > 141 && ld->special != 271 && ld->special != 272)
+	if ((unsigned short) ld->special > LINEDEF_LIMIT && ld->special != 271 && ld->special != 272)
 	{
 	    fprintf(stderr, "P_LoadLineDefs: Unknown special %d at line %d.\n", ld->special, i);
 	    warn++;

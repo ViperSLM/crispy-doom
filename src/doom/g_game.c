@@ -1122,7 +1122,7 @@ void G_DoLoadLevel (void)
         players[consoleplayer].message = "Press escape to quit.";
     }
 
-    L_LoadMapScriptFromWAD(maplumpinfo->name);
+    L_LoadMapScript(maplumpinfo->name);
 } 
 
 static void SetJoyButtons(unsigned int buttons_mask)

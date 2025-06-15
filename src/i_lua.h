@@ -4,6 +4,7 @@
 #define _VSLM_LUA_H_
 typedef struct lua_State lua_State;
 typedef int (*lua_CFunction)(lua_State *);
+typedef struct line_s line_t;
 
 // Lua VM
 extern lua_State *lvm;
@@ -11,7 +12,14 @@ extern lua_State *lvm;
 void L_Start(void);
 void L_Stop(void);
 void L_DefaultLibs(void);
-void L_LoadMapScriptFromWAD(const char *mapName);
+void L_LoadMapScript(const char *mapName);
+
+/* -- Lua events -- */
+
+// Run OnSwitchActivate (output)
+void L_LinedefSwitchActivate(line_t *line);
+
+/* ---------------- */
 
 /*
     Used to load game-specific bindings

@@ -4,6 +4,9 @@
 
 #include "deh_str.h"
 #include "g_game.h"
+#include "r_defs.h"
+
+extern lua_State *lvm;
 
 // _G functions
 int L_G_ExitLevel(lua_State *L)
@@ -25,3 +28,18 @@ int luaopen_doom(lua_State *L)
     lua_setglobal(L, "Doom");
     return 1;
 }
+
+/* --- Lua Events --- */
+void L_LinedefSwitchActivate(line_t *line)
+{
+    lua_getglobal(lvm, "OnSwitchActivate");
+    if (lua_isfunction(lvm, -1)) // Ensure global is a function
+    {
+        // Push linedef tag as first arg
+        lua_pushinteger(lvm, line->tag);
+
+        // Run
+        lua_pcall(lvm, 1, 0, 0);
+    }
+}
+/* ------------------ */

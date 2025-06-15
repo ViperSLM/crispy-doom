@@ -38,6 +38,8 @@
 #include "doomstat.h"
 #include "r_state.h"
 
+// ViperSLM: Lua
+#include "i_lua.h"
 
 //
 // CHANGE THE TEXTURE OF A WALL SWITCH TO ITS OPPOSITE
@@ -718,6 +720,11 @@ P_UseSpecialLine
 	P_ChangeSwitchTexture(line,1);
 	break;
 			
+	  // Run OnSwitchActivate Lua function (once)
+	  case 142:
+		L_LinedefSwitchActivate(line);
+		P_ChangeSwitchTexture(line, 0);
+	  break;
     }
 	
     return true;

@@ -1,4 +1,8 @@
 set(VSLM_UTIL vslm.c)
+set(LUA_DOOM)
+if(${ENABLE_LUA})
+    set(LUA_DOOM l_doom.c)
+endif()
 
 add_library(doom STATIC
             am_map.c        am_map.h
@@ -82,7 +86,7 @@ add_library(doom STATIC
             st_stuff.c      st_stuff.h
             v_snow.c        v_snow.h
             wi_stuff.c      wi_stuff.h
-            ${VSLM_UTIL}    l_doom.c )
+            ${VSLM_UTIL}    ${LUA_DOOM} )
 
 target_include_directories(doom PRIVATE "../" "${CMAKE_CURRENT_BINARY_DIR}/../../" ${LUAJIT_INCLUDE_DIR})
 target_link_libraries(doom SDL2::SDL2)

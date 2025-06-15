@@ -4,6 +4,7 @@ endforeach()
 
 option(ENABLE_LUA "Enable Lua scripting language support for Crispy Doom" OFF)
 set(LUA_SOURCE_FILES)
+set(LUA_SOURCE_FILES_DOOM)
 
 if(${ENABLE_LUA})
     set(LUAJIT_INCLUDE_DIR "" CACHE PATH "Include directory for LuaJIT")
@@ -12,7 +13,10 @@ if(${ENABLE_LUA})
         i_lua.c             i_lua.h
     )
     include_directories(${LUAJIT_INCLUDE_DIR})
-    add_compile_definitions(LUA_ENABLED)
+else()
+    set(LUA_SOURCE_FILES
+        i_lua_stub.c    i_lua.h
+    )
 endif()
 
 # Common source files used by absolutely everything:
