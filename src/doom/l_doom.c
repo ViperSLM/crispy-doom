@@ -7,7 +7,9 @@
 #include <lauxlib.h>
 
 #include "deh_str.h"
-#include "sounds.h"
+#include "m_argv.h"
+#include "p_local.h"
+#include "p_spec.h"
 #include "s_sound.h"
 #include "g_game.h"
 #include "r_defs.h"
@@ -23,8 +25,8 @@ int luaopen_doom(lua_State *L);
 // Setup function
 void L_Setup(void)
 {
-    L_LoadScript("DOOM");
     L_LoadLib(luaopen_doom);
+    L_LoadScript("DOOM");
 }
 
 void L_RunMainFunction(void)
@@ -34,6 +36,7 @@ void L_RunMainFunction(void)
         lua_pcall(lvm, 0, 0, 0);
 }
 
+/* ------ Doom function bindings ------ */
 int L_G_ExitLevel(lua_State *L)
 {
     // Exits current level
@@ -57,10 +60,78 @@ int L_ST_PrintMsg(lua_State *L)
     return 0;
 }
 
+int L_P_SpawnMobj(lua_State *L)
+{
+    fixed_t x,y,z;
+    mobjtype_t type;
+    mobj_t *actor; // Fog is used for the teleport effect
+    subsector_t *subsector;
+
+    x = lua_tointeger(L, 1);
+    y = lua_tointeger(L, 2);
+    z = ONFLOORZ;
+    type = lua_tointeger(L, 3);
+    //z = lua_tointeger(L, 3); // Maybe Z can be overidden
+
+    subsector = R_PointInSubsector(x, y);
+    actor = P_SpawnMobj(x, y, subsector->sector->floorheight, MT_TFOG);
+    S_StartSound(actor, sfx_telept);
+
+    actor = P_SpawnMobj(x, y, z, type);
+
+    lua_pushinteger(L, actor->x);
+    lua_pushinteger(L, actor->y);
+    lua_pushinteger(L, actor->z);
+    lua_pushinteger(L, actor->angle);
+    lua_pushinteger(L, actor->type);
+    lua_pushlightuserdata(L, actor);
+    return 6;
+}
+
+// LineDef bindings
+int L_Linedef_OpenDoor(lua_State *L)
+{
+    line_t line;
+    // Get linedef tag from input
+    line.tag = lua_tointeger(lvm, 1);
+    EV_DoDoor(&line, vld_open);
+    return 0;
+}
+
+int L_Linedef_CloseDoor(lua_State *L)
+{
+    line_t line;
+    // Get linedef tag from input
+    line.tag = lua_tointeger(lvm, 1);
+    EV_DoDoor(&line, vld_close);
+    return 0;
+}
+
+int L_Sector_LightLevel(lua_State *L)
+{
+    line_t line;
+    int lightlevel;
+    line.tag = lua_tointeger(lvm, 1);       // Sector tag
+    lightlevel = lua_tointeger(lvm, 2); // Light level to change to
+
+    EV_LightTurnOn(&line, lightlevel);
+    if(M_CheckParm("-vslmdebug"))
+    {
+        DEH_printf("[VSLM DEBUG] L_Sector_Lightlevel: Tag = %d, Light level = %d\n", line.tag, lightlevel);
+    }
+    return 0;
+}
+
+/* ------------------------------------ */
+
 static const luaL_Reg doomLib[] = {
     {"G_ExitLevel", L_G_ExitLevel},
     {"S_ChangeMusic", L_S_ChangeMusic},
-    {"PrintToHUD", L_ST_PrintMsg},
+    {"P_SpawnMobj", L_P_SpawnMobj},
+    {"PrintHUD", L_ST_PrintMsg},
+    {"OpenDoor", L_Linedef_OpenDoor},
+    {"CloseDoor", L_Linedef_CloseDoor},
+    {"SectorLightLevel", L_Sector_LightLevel},
     {NULL, NULL}
 };
 

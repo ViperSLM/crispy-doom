@@ -22,8 +22,9 @@ extern GameMission_t gamemission;
 
 lua_State *lvm;
 
-// Override print function
+// Override functions (prototypes)
 int L_Print(lua_State *L);
+int L_LoadLuaScript(lua_State *L);
 
 void L_Start (void)
 {
@@ -64,6 +65,7 @@ void L_DefaultLibs (void)
     // Override default functions
     const luaL_Reg overrideLib[] = {
         {"print", L_Print},
+        {"LoadScript", L_LoadLuaScript},
         {NULL,NULL}
     };
 
@@ -189,6 +191,13 @@ int L_Print(lua_State *L)
     const char *in = luaL_checkstring(L, 1);
     DEH_printf("[Lua] %s\n", in);
     return 0; // Don't return anything to Lua
+}
+
+int L_LoadLuaScript(lua_State *L)
+{
+    const char *filename = luaL_checkstring(L, 1);
+    L_LoadScript(filename);
+    return 0;
 }
 
 // Moved into l_doom.c
