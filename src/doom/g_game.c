@@ -83,7 +83,6 @@
 
 // ViperSLM: Lua scripting
 #include "i_lua.h"
-#include <luajit.h>
 
 #define SAVEGAMESIZE	0x2c000
 
@@ -1122,7 +1121,10 @@ void G_DoLoadLevel (void)
         players[consoleplayer].message = "Press escape to quit.";
     }
 
-    L_LoadMapScript(maplumpinfo->name);
+    L_LoadScript(maplumpinfo->name);
+
+    // OnMapLoad event
+    L_Event_MapLoad();
 } 
 
 static void SetJoyButtons(unsigned int buttons_mask)

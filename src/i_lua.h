@@ -11,13 +11,18 @@ extern lua_State *lvm;
 
 void L_Start(void);
 void L_Stop(void);
+void L_Setup(void); // Different, depending on the game
 void L_DefaultLibs(void);
-void L_LoadMapScript(const char *mapName);
+void L_LoadScript(const char *script);
+void L_RunMainFunction(void); // Different, depending on the game
 
 /* -- Lua events -- */
 
 // Run OnSwitchActivate (output)
-void L_LinedefSwitchActivate(line_t *line);
+void L_Event_LinedefSwitchActivate(line_t *line);
+
+// Run OnMapLoad
+void L_Event_MapLoad(void);
 
 /* ---------------- */
 
@@ -35,9 +40,20 @@ void L_LinedefSwitchActivate(line_t *line);
 */
 void L_LoadLib(lua_CFunction func);
 
+/*
+    Load Lua script file, either from a
+    WAD file or loose
+*/
+
+
 #define I_InitLua() \
     L_Start(); \
     L_DefaultLibs(); \
+    L_Setup(); \
+    L_LoadScript("MAIN"); \
+    L_RunMainFunction(); \
     I_AtExit(L_Stop, false)
     
+
+#define Lua_Include()
 #endif

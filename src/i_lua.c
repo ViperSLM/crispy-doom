@@ -1,4 +1,5 @@
 /* Lua scripting support */
+#include "d_mode.h"
 #include "deh_str.h"
 #include "i_lua.h"
 #include "i_system.h"
@@ -6,11 +7,18 @@
 #include "w_wad.h"
 #include "z_zone.h"
 
+#ifdef USE_LUAJIT
 #include <luajit.h>
+#else
+#include <lua.h>
+#endif
 #include <lauxlib.h>
 #include <lualib.h>
 
-extern int M_CheckParm(const char *check);
+int M_CheckParm(const char *check);
+
+// Externs
+extern GameMission_t gamemission;
 
 lua_State *lvm;
 
@@ -19,7 +27,12 @@ int L_Print(lua_State *L);
 
 void L_Start (void)
 {
-    DEH_printf("L_Start: Starting Lua VM\n");
+    DEH_printf("L_Start: Starting %s", LUA_RELEASE);
+#ifdef USE_LUAJIT
+    DEH_printf(" (%s)\n", LUAJIT_VERSION);
+#else
+    DEH_printf("\n");
+#endif
     lvm = luaL_newstate();
 
     if(!lvm)
@@ -40,9 +53,11 @@ void L_DefaultLibs (void)
         {LUA_STRLIBNAME, luaopen_string},
         {LUA_TABLIBNAME, luaopen_table},
         {LUA_LOADLIBNAME, luaopen_package},
+#ifdef USE_LUAJIT
         {LUA_BITLIBNAME, luaopen_bit},
         {LUA_JITLIBNAME, luaopen_jit},
         {LUA_FFILIBNAME, luaopen_ffi},
+#endif
         {NULL, NULL}
     };
 
@@ -73,7 +88,7 @@ void L_LoadLib(lua_CFunction func)
     lua_pcall(lvm, 0, 1, 0);
 }
 
-void L_LoadMapScript(const char *mapName)
+void L_LoadScript(const char *script)
 {
     char filename[8];
     char filenameloose[sizeof(filename)+4]; // Extra size is for extension
@@ -90,26 +105,26 @@ void L_LoadMapScript(const char *mapName)
     looseFileLen = 0;
     readbytes = 0;
 
-    M_snprintf(filename, sizeof(filename), "L_%s", mapName);
+    M_snprintf(filename, sizeof(filename), "L_%s", script);
+    M_snprintf(filenameloose, sizeof(filenameloose), "%s.lua", script);
 
     lumpnum = W_CheckNumForName(filename);
 
     // Does a script exist for the map?
     if(lumpnum != -1)
     {
-        DEH_printf("L_LoadMapScript: Loading Lua script '%s'\n", filename); 
+        DEH_printf("L_LoadScript: Loading Lua script '%s'\n", filename); 
         scriptlump = W_CacheLumpName(filename, PU_CACHE);
     }
     else 
     {
-        DEH_printf("L_LoadMapScript: Cannot find '%s' lump in WAD. Attempting "
+        DEH_printf("L_LoadScript: Cannot find '%s' lump in WAD. Attempting "
                    "to load it loose\n",
                    filename);
-        M_snprintf(filenameloose, sizeof(filenameloose), "%s.lua", filename);
         looseFilePtr = fopen(filenameloose, "r");
         if(!looseFilePtr) // Not found
         {
-            DEH_printf("L_LoadMapScript: Cannot load script '%s'. Will not "
+            DEH_printf("L_LoadScript: Cannot load script '%s'. Will not "
                        "continue trying.\n",
                        filename);
             return;
@@ -123,7 +138,7 @@ void L_LoadMapScript(const char *mapName)
         if(readbytes != looseFileLen)
         {
             fclose(looseFilePtr);
-            DEH_printf("L_LoadMapScript: Cannot load script '%s'. Will not "
+            DEH_printf("L_LoadScript: Cannot load script '%s'. Will not "
                        "continue trying. (Couldn't read file)\n",
                        filename);
             return;
@@ -131,32 +146,35 @@ void L_LoadMapScript(const char *mapName)
 
         // Null-terminate
         scriptlump[looseFileLen] = '\0';
-        DEH_printf("L_LoadMapScript: Successfully loaded loose script '%s'.\n", filenameloose);
+        DEH_printf("L_LoadScript: Successfully loaded loose script '%s'.\n", filenameloose);
     }
 
 
     // Script lump is only needed to load the script into the Lua VM
     if (luaL_dostring(lvm, scriptlump) != LUA_OK)
     {
-        DEH_printf("L_LoadMapScript: Lua Error(s) found in "
+        DEH_printf("L_LoadScript: Lua Error(s) found in "
                    "script '%s'\nContents of script:\n%s\n%s\n\n",
                    filename, scriptlump, lua_tostring(lvm, -1));
         if (M_CheckParm("-vslmdebug"))
         {
             // Crash on Lua error if debug flag is enabled
-            I_Error("[VSLM DEBUG] - L_LoadMapScript:: Errors found in Lua "
+            I_Error("[VSLM DEBUG] - L_LoadScript:: Errors found in Lua "
                     "script (see above).");
         }
     }
+    /*
     else
     {
         // Run the OnMapLoad function
+        // (Deprecated: moved to L_MapLoad())
         lua_getglobal(lvm, "OnMapLoad");
         if (lua_isfunction(lvm, -1)) // OnMapLoad is actually a function
         {
             lua_pcall(lvm, 0, 0, 0);
         }
     }
+    */
     // If file was loaded loose, close the file and free up memory
     if(looseFilePtr && scriptlump)
     {

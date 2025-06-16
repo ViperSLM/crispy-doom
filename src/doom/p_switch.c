@@ -722,8 +722,14 @@ P_UseSpecialLine
 			
 	  // Run OnSwitchActivate Lua function (once)
 	  case 142:
-		L_LinedefSwitchActivate(line);
+		L_Event_LinedefSwitchActivate(line);
 		P_ChangeSwitchTexture(line, 0);
+	  break;
+
+	  // Run OnSwitchActivate Lua function (repeatable)
+	  case 143:
+		L_Event_LinedefSwitchActivate(line);
+		P_ChangeSwitchTexture(line, 1);
 	  break;
     }
 	

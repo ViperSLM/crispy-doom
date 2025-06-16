@@ -2127,9 +2127,6 @@ void D_DoomMain (void)
     // Start Lua
     I_InitLua();
 
-    // Load Doom bindings
-    L_LoadLib(luaopen_doom);
-
     // [crispy] check for SSG resources
     crispy->havessg =
     (

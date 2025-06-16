@@ -6,12 +6,13 @@ option(ENABLE_LUA "Enable Lua scripting language support for Crispy Doom" OFF)
 set(LUA_SOURCE_FILES)
 
 if(${ENABLE_LUA})
-    set(LUAJIT_INCLUDE_DIR "" CACHE PATH "Include directory for LuaJIT")
-    set(LUAJIT_LIBRARY "" CACHE FILEPATH "Library file path for LuaJIT")
+    option(LUAJIT_SUPPORT "Use LuaJIT's header instead" OFF)
+    set(LUA_INCLUDE_DIR "" CACHE PATH "Include directory for Lua/LuaJIT")
+    set(LUA_LIBRARY "" CACHE FILEPATH "Library file path for Lua/LuaJIT")
     set(LUA_SOURCE_FILES
         i_lua.c             i_lua.h
     )
-    include_directories(${LUAJIT_INCLUDE_DIR})
+    include_directories(${LUA_INCLUDE_DIR})
 else()
     set(LUA_SOURCE_FILES
         i_lua_stub.c    i_lua.h
@@ -146,7 +147,7 @@ set(DEHACKED_SOURCE_FILES
 set(SOURCE_FILES ${COMMON_SOURCE_FILES} ${GAME_SOURCE_FILES} ${LUA_SOURCE_FILES})
 set(SOURCE_FILES_WITH_DEH ${SOURCE_FILES} ${DEHACKED_SOURCE_FILES})
 
-set(EXTRA_LIBS SDL2::SDL2main SDL2::SDL2 textscreen pcsound opl ${LUAJIT_LIBRARY})
+set(EXTRA_LIBS SDL2::SDL2main SDL2::SDL2 textscreen pcsound opl ${LUA_LIBRARY})
 if(ENABLE_SDL2_MIXER)
     list(APPEND EXTRA_LIBS SDL2_mixer::SDL2_mixer)
 endif()
@@ -172,7 +173,7 @@ else()
     add_executable("${PROGRAM_PREFIX}doom" ${SOURCE_FILES_WITH_DEH})
 endif()
 
-target_include_directories("${PROGRAM_PREFIX}doom" PRIVATE ${GAME_INCLUDE_DIRS} ${LUAJIT_INCLUDE_DIR})
+target_include_directories("${PROGRAM_PREFIX}doom" PRIVATE ${GAME_INCLUDE_DIRS} ${LUA_INCLUDE_DIR})
 target_link_libraries("${PROGRAM_PREFIX}doom" doom ${EXTRA_LIBS})
 
 if(MSVC)
@@ -186,7 +187,7 @@ else()
     add_executable("${PROGRAM_PREFIX}heretic" ${SOURCE_FILES_WITH_DEH})
 endif()
 
-target_include_directories("${PROGRAM_PREFIX}heretic" PRIVATE ${GAME_INCLUDE_DIRS} ${LUAJIT_INCLUDE_DIR})
+target_include_directories("${PROGRAM_PREFIX}heretic" PRIVATE ${GAME_INCLUDE_DIRS} ${LUA_INCLUDE_DIR})
 target_link_libraries("${PROGRAM_PREFIX}heretic" heretic ${EXTRA_LIBS})
 
 if(MSVC)
@@ -201,7 +202,7 @@ else()
 endif()
 
 # Integrating Lua with Hexen feels rather pointless because of ACS
-target_include_directories("${PROGRAM_PREFIX}hexen" PRIVATE ${GAME_INCLUDE_DIRS} ${LUAJIT_INCLUDE_DIR})
+target_include_directories("${PROGRAM_PREFIX}hexen" PRIVATE ${GAME_INCLUDE_DIRS} ${LUA_INCLUDE_DIR})
 target_link_libraries("${PROGRAM_PREFIX}hexen" hexen ${EXTRA_LIBS})
 
 if(MSVC)
@@ -215,7 +216,7 @@ else()
     add_executable("${PROGRAM_PREFIX}strife" ${SOURCE_FILES_WITH_DEH})
 endif()
 
-target_include_directories("${PROGRAM_PREFIX}strife" PRIVATE ${GAME_INCLUDE_DIRS} ${LUAJIT_INCLUDE_DIR})
+target_include_directories("${PROGRAM_PREFIX}strife" PRIVATE ${GAME_INCLUDE_DIRS} ${LUA_INCLUDE_DIR})
 target_link_libraries("${PROGRAM_PREFIX}strife" strife ${EXTRA_LIBS})
 
 if(MSVC)
@@ -273,3 +274,10 @@ add_executable(mus2mid mus2mid.c memio.c z_native.c i_system.c m_argv.c m_misc.c
 target_compile_definitions(mus2mid PRIVATE "-DSTANDALONE")
 target_include_directories(mus2mid PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/../")
 target_link_libraries(mus2mid SDL2::SDL2)
+
+# Add LuaJIT macr
+if(${LUAJIT_SUPPORT})
+    target_compile_definitions("${PROGRAM_PREFIX}doom" PRIVATE -DUSE_LUAJIT)
+    target_compile_definitions("${PROGRAM_PREFIX}heretic" PRIVATE -DUSE_LUAJIT)
+    target_compile_definitions("${PROGRAM_PREFIX}strife" PRIVATE -DUSE_LUAJIT)
+endif()

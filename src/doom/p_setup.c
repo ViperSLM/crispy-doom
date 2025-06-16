@@ -1334,20 +1334,6 @@ P_SetupLevel
 
     //printf ("free memory: 0x%x\n", Z_FreeMemory());
 
-    /*
-    // Load Lua script for specified map and run OnMapLoad()
-    M_snprintf(mapScriptName, sizeof(mapScriptName), "L_%s", VSLM_GetCurrentMap());
-    if (W_GetNumForName(mapScriptName) != -1)
-    {
-        DEH_printf("Lua script lump '%s' found!\n", mapScriptName);
-
-        if(M_CheckParm("-vslmdebug"))
-        {
-            DEH_printf("[VSLM DEBUG] Contents of map script:\n%s", mapscript);
-        }
-    }
-    // mapscript = W_CacheLumpName("");
-    */
 }
 
 
