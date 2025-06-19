@@ -297,6 +297,9 @@ typedef struct mobj_s
     fixed_t		oldz;
     angle_t		oldangle;
 
+    // ViperSLM:
+    // Don't randomize the mobj during randomizer
+    boolean norandom;
 } mobj_t;
 
 

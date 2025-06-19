@@ -36,7 +36,8 @@
 // Data.
 #include "sounds.h"
 
-
+// Viper's utilities
+#include <vslm.h>
 
 
 typedef enum
@@ -72,17 +73,13 @@ dirtype_t diags[] =
 extern int M_CheckParm (const char* check);
 extern void ST_PrintMsg(const char *format, ...);
 
-extern void VSLM_RespawnMonster(mobj_t *actor);
-extern void VSLM_TriggerTag666(boolean tag667);
-
-
 void A_Tag666(void)
 {
     if(M_CheckParm("-devparm"))
     {
         ST_PrintMsg("Triggered Tag 666");
     }
-    if(!M_CheckParm("-vslmdebug"))
+    if(!M_CheckParm("-notag666"))
     {
         VSLM_TriggerTag666(false);
         return;
@@ -95,7 +92,7 @@ void A_Tag667(void)
     {
         ST_PrintMsg("Triggered Tag 667");
     }
-    if(!M_CheckParm("-vslmdebug"))
+    if(!M_CheckParm("-notag666"))
     {
         VSLM_TriggerTag666(true);
         return;

@@ -2,7 +2,11 @@ function LoadScript(file)
     -- Placeholder
 end
 
-Doom = {}
-Doom.P_SpawnMobj = function(x,y,type)
--- Placeholder
+function RandomSeed(seed)
+    -- Placeholder
 end
+
+Doom = {}
+--Doom.P_SpawnMobj = function(x,y,type)
+-- Placeholder
+--end

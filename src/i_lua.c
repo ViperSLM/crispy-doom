@@ -26,7 +26,7 @@ lua_State *lvm;
 int L_Print(lua_State *L);
 int L_LoadLuaScript(lua_State *L);
 
-void L_Start (void)
+void L_Start(void)
 {
     DEH_printf("L_Start: Starting %s", LUA_RELEASE);
 #ifdef USE_LUAJIT
@@ -64,8 +64,7 @@ void L_DefaultLibs (void)
 
     // Override default functions
     const luaL_Reg overrideLib[] = {
-        {"print", L_Print},
-        {"LoadScript", L_LoadLuaScript},
+        {"print", L_Print}, {"LoadScript", L_LoadLuaScript},
         {NULL,NULL}
     };
 
@@ -90,7 +89,7 @@ void L_LoadLib(lua_CFunction func)
     lua_pcall(lvm, 0, 1, 0);
 }
 
-void L_LoadScript(const char *script)
+void L_LoadScript(const char *script, const char *entry)
 {
     char filename[8];
     char filenameloose[sizeof(filename)+4]; // Extra size is for extension
@@ -99,6 +98,7 @@ void L_LoadScript(const char *script)
     FILE *looseFilePtr;
     size_t looseFileLen;
     size_t readbytes;
+    //boolean readsuccess;
 
     // Initialise variables
     scriptlump = NULL;
@@ -121,30 +121,37 @@ void L_LoadScript(const char *script)
     else 
     {
         DEH_printf("L_LoadScript: Cannot find '%s' lump in WAD. Attempting "
-                   "to load it loose\n",
-                   filename);
+                   "to load it loose\n",filename);
         looseFilePtr = fopen(filenameloose, "r");
         if(!looseFilePtr) // Not found
         {
             DEH_printf("L_LoadScript: Cannot load script '%s'. Will not "
                        "continue trying.\n",
-                       filename);
+                       filenameloose);
             return;
         }
 
         // Successfully loaded?
         looseFileLen = M_FileLength(looseFilePtr);
-        scriptlump = Z_Malloc(looseFileLen + 1, PU_STATIC, NULL);
-
+        scriptlump = Z_Malloc((int)looseFileLen + 1, PU_STATIC, NULL);
         readbytes = fread(scriptlump, 1, looseFileLen, looseFilePtr);
-        if(readbytes != looseFileLen)
-        {
-            fclose(looseFilePtr);
-            DEH_printf("L_LoadScript: Cannot load script '%s'. Will not "
-                       "continue trying. (Couldn't read file)\n",
-                       filename);
-            return;
-        }
+
+        // readsuccess = (readbytes != looseFileLen);
+        // if (readsuccess)
+        // {
+        //     fclose(looseFilePtr);
+        //     DEH_printf("L_LoadScript: Cannot load script '%s'. Will not "
+        //                "continue trying. (Couldn't read file)\n",
+        //                filename);
+        //     if (M_CheckParm("-vslmdebug"))
+        //     {
+        //         I_Error("[VSLM DEBUG]: L_LoadScript: Error loading script '%s'. "
+        //                 "File length and read bytes aren't the same. (Line endings?)",
+        //                 filenameloose);
+        //         return;
+        //     }
+        //     return;
+        // }
 
         // Null-terminate
         scriptlump[looseFileLen] = '\0';
@@ -165,6 +172,7 @@ void L_LoadScript(const char *script)
                     "script (see above).");
         }
     }
+
     /*
     else
     {
@@ -183,6 +191,14 @@ void L_LoadScript(const char *script)
         fclose(looseFilePtr);
         Z_Free(scriptlump);
     }
+
+    /* If entry pointer is not NULL, run the entry point function */
+    if (entry != NULL)
+    {
+        lua_getglobal(lvm, entry);
+        if (lua_isfunction(lvm, -1))
+            lua_pcall(lvm, 0, 0, 0);
+    }
 }
 
 // Overriding functions
@@ -196,7 +212,7 @@ int L_Print(lua_State *L)
 int L_LoadLuaScript(lua_State *L)
 {
     const char *filename = luaL_checkstring(L, 1);
-    L_LoadScript(filename);
+    L_LoadScript(filename, NULL);
     return 0;
 }
 

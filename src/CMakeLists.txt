@@ -1,7 +1,3 @@
-foreach(SUBDIR doom heretic hexen strife setup)
-    add_subdirectory("${SUBDIR}")
-endforeach()
-
 option(ENABLE_LUA "Enable Lua scripting language support for Crispy Doom" OFF)
 set(LUA_SOURCE_FILES)
 
@@ -18,6 +14,18 @@ else()
         i_lua_stub.c    i_lua.h
     )
 endif()
+
+if(WIN32)
+	option(USE_WINMAIN "Compile with GUI subsystem [Windows only]" OFF)
+	set(ENTRYPOINT)
+	if(USE_WINMAIN)
+		set(ENTRYPOINT WIN32)
+	endif()
+endif()
+
+foreach(SUBDIR vslm doom heretic hexen strife setup)
+    add_subdirectory("${SUBDIR}")
+endforeach()
 
 # Common source files used by absolutely everything:
 
@@ -48,7 +56,7 @@ set(DEDSERV_FILES
     net_structrw.c      net_structrw.h
     z_native.c          z_zone.h)
 
-add_executable("${PROGRAM_PREFIX}server" WIN32 ${COMMON_SOURCE_FILES} ${DEDSERV_FILES})
+add_executable("${PROGRAM_PREFIX}server" ${ENTRYPOINT} ${COMMON_SOURCE_FILES} ${DEDSERV_FILES})
 target_include_directories("${PROGRAM_PREFIX}server"
                            PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/../")
 target_link_libraries("${PROGRAM_PREFIX}server" SDL2::SDL2main SDL2::SDL2)
@@ -135,6 +143,8 @@ if(MSVC)
          "${PROJECT_SOURCE_DIR}/win32/")
 endif()
 
+list(APPEND GAME_INCLUDE_DIRS "${CMAKE_SOURCE_DIR}/src/vslm")
+
 set(DEHACKED_SOURCE_FILES
     deh_defs.h
     deh_io.c            deh_io.h
@@ -167,25 +177,27 @@ if(WIN32)
 	list(APPEND EXTRA_LIBS winmm)
 endif()
 
-if(WIN32)
-    add_executable("${PROGRAM_PREFIX}doom" WIN32 ${SOURCE_FILES_WITH_DEH} "${CMAKE_CURRENT_BINARY_DIR}/doom-res.rc")
-else()
-    add_executable("${PROGRAM_PREFIX}doom" ${SOURCE_FILES_WITH_DEH})
-endif()
+#if(WIN32)
+#    add_executable("${PROGRAM_PREFIX}doom" WIN32 ${SOURCE_FILES_WITH_DEH} "${CMAKE_CURRENT_BINARY_DIR}/doom-res.rc")
+#else()
+#    add_executable("${PROGRAM_PREFIX}doom" ${SOURCE_FILES_WITH_DEH})
+#endif()
+add_executable("${PROGRAM_PREFIX}doom" ${ENTRYPOINT} ${SOURCE_FILES_WITH_DEH})
 
 target_include_directories("${PROGRAM_PREFIX}doom" PRIVATE ${GAME_INCLUDE_DIRS} ${LUA_INCLUDE_DIR})
-target_link_libraries("${PROGRAM_PREFIX}doom" doom ${EXTRA_LIBS})
+target_link_libraries("${PROGRAM_PREFIX}doom" doom vslm vslm-doom ${EXTRA_LIBS})
 
 if(MSVC)
     set_target_properties("${PROGRAM_PREFIX}doom" PROPERTIES
                           LINK_FLAGS "/MANIFEST:NO")
 endif()
 
-if(WIN32)
-    add_executable("${PROGRAM_PREFIX}heretic" WIN32 ${SOURCE_FILES_WITH_DEH} "${CMAKE_CURRENT_BINARY_DIR}/heretic-res.rc")
-else()
-    add_executable("${PROGRAM_PREFIX}heretic" ${SOURCE_FILES_WITH_DEH})
-endif()
+#if(WIN32)
+#    add_executable("${PROGRAM_PREFIX}heretic" WIN32 ${SOURCE_FILES_WITH_DEH} "${CMAKE_CURRENT_BINARY_DIR}/heretic-res.rc")
+#else()
+#    add_executable("${PROGRAM_PREFIX}heretic" ${SOURCE_FILES_WITH_DEH})
+#endif()
+add_executable("${PROGRAM_PREFIX}heretic" ${ENTRYPOINT} ${SOURCE_FILES_WITH_DEH})
 
 target_include_directories("${PROGRAM_PREFIX}heretic" PRIVATE ${GAME_INCLUDE_DIRS} ${LUA_INCLUDE_DIR})
 target_link_libraries("${PROGRAM_PREFIX}heretic" heretic ${EXTRA_LIBS})
@@ -195,11 +207,12 @@ if(MSVC)
                           LINK_FLAGS "/MANIFEST:NO")
 endif()
 
-if(WIN32)
-    add_executable("${PROGRAM_PREFIX}hexen" WIN32 ${SOURCE_FILES} "${CMAKE_CURRENT_BINARY_DIR}/hexen-res.rc")
-else()
-    add_executable("${PROGRAM_PREFIX}hexen" ${SOURCE_FILES})
-endif()
+#if(WIN32)
+#    add_executable("${PROGRAM_PREFIX}hexen" WIN32 ${SOURCE_FILES} "${CMAKE_CURRENT_BINARY_DIR}/hexen-res.rc")
+#else()
+#    add_executable("${PROGRAM_PREFIX}hexen" ${SOURCE_FILES})
+#endif()
+add_executable("${PROGRAM_PREFIX}hexen" ${ENTRYPOINT} ${SOURCE_FILES})
 
 # Integrating Lua with Hexen feels rather pointless because of ACS
 target_include_directories("${PROGRAM_PREFIX}hexen" PRIVATE ${GAME_INCLUDE_DIRS} ${LUA_INCLUDE_DIR})
@@ -210,11 +223,12 @@ if(MSVC)
                           LINK_FLAGS "/MANIFEST:NO")
 endif()
 
-if(WIN32)
-    add_executable("${PROGRAM_PREFIX}strife" WIN32 ${SOURCE_FILES_WITH_DEH} "${CMAKE_CURRENT_BINARY_DIR}/strife-res.rc")
-else()
-    add_executable("${PROGRAM_PREFIX}strife" ${SOURCE_FILES_WITH_DEH})
-endif()
+#if(WIN32)
+#    add_executable("${PROGRAM_PREFIX}strife" WIN32 ${SOURCE_FILES_WITH_DEH} "${CMAKE_CURRENT_BINARY_DIR}/strife-res.rc")
+#else()
+#    add_executable("${PROGRAM_PREFIX}strife" ${SOURCE_FILES_WITH_DEH})
+#endif()
+add_executable("${PROGRAM_PREFIX}strife" ${ENTRYPOINT} ${SOURCE_FILES_WITH_DEH})
 
 target_include_directories("${PROGRAM_PREFIX}strife" PRIVATE ${GAME_INCLUDE_DIRS} ${LUA_INCLUDE_DIR})
 target_link_libraries("${PROGRAM_PREFIX}strife" strife ${EXTRA_LIBS})
@@ -241,11 +255,12 @@ set(SETUP_FILES
     net_structrw.c      net_structrw.h
     z_native.c          z_zone.h)
 
-if(WIN32)
-    add_executable("${PROGRAM_PREFIX}setup" WIN32 ${SETUP_FILES} ${COMMON_SOURCE_FILES} "${CMAKE_CURRENT_BINARY_DIR}/setup-res.rc")
-else()
-    add_executable("${PROGRAM_PREFIX}setup" ${SETUP_FILES} ${COMMON_SOURCE_FILES})
-endif()
+#if(WIN32)
+#    add_executable("${PROGRAM_PREFIX}setup" WIN32 ${SETUP_FILES} ${COMMON_SOURCE_FILES} "${CMAKE_CURRENT_BINARY_DIR}/setup-res.rc")
+#else()
+#    add_executable("${PROGRAM_PREFIX}setup" ${SETUP_FILES} ${COMMON_SOURCE_FILES})
+#endif()
+add_executable("${PROGRAM_PREFIX}setup" ${ENTRYPOINT} ${SETUP_FILES} ${COMMON_SOURCE_FILES})
 
 target_include_directories("${PROGRAM_PREFIX}setup"
                            PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/../")
@@ -275,8 +290,8 @@ target_compile_definitions(mus2mid PRIVATE "-DSTANDALONE")
 target_include_directories(mus2mid PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/../")
 target_link_libraries(mus2mid SDL2::SDL2)
 
-# Add LuaJIT macr
-if(${LUAJIT_SUPPORT})
+# Add LuaJIT macro
+if(LUAJIT_SUPPORT)
     target_compile_definitions("${PROGRAM_PREFIX}doom" PRIVATE -DUSE_LUAJIT)
     target_compile_definitions("${PROGRAM_PREFIX}heretic" PRIVATE -DUSE_LUAJIT)
     target_compile_definitions("${PROGRAM_PREFIX}strife" PRIVATE -DUSE_LUAJIT)

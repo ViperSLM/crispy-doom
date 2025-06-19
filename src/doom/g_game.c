@@ -84,6 +84,8 @@
 // ViperSLM: Lua scripting
 #include "i_lua.h"
 
+#include <vslm.h>
+
 #define SAVEGAMESIZE	0x2c000
 
 extern const char *VSLM_GetCurrentMap(void);
@@ -1121,10 +1123,22 @@ void G_DoLoadLevel (void)
         players[consoleplayer].message = "Press escape to quit.";
     }
 
-    L_LoadScript(maplumpinfo->name);
+    // ViperSLM:
+    // Make sure the game is not running any demos
+    // as loading these scripts would inevitably
+    // break demo compatibility
+    if (oldgamestate != GS_DEMOSCREEN && (!demoplayback && !demorecording))
+    {
+        // Randomizer + Chaos Mode
+        if (M_CheckParm("-chaos"))
+            RAND_CHAOS = true;
+        if (M_CheckParm("-randomizer"))
+            VSLM_RandomizeMonsters(false);
 
-    // OnMapLoad event
-    L_Event_MapLoad();
+        // OnGlobalMapLoad + OnMapLoad Lua events
+        L_Event_GlobalMapLoad();
+        L_LoadScript(maplumpinfo->name, "OnMapLoad");
+    }
 } 
 
 static void SetJoyButtons(unsigned int buttons_mask)
@@ -1955,6 +1969,13 @@ void G_ExitLevel (void)
 { 
     secretexit = false; 
     G_ClearSavename();
+
+    if (oldgamestate != GS_DEMOSCREEN && (!demoplayback && !demorecording))
+    {
+        // Map exit Lua events
+        L_Event_GlobalMapExit();
+        L_LoadScript(maplumpinfo->name, "OnMapExit");
+    }
     gameaction = ga_completed; 
 } 
 
@@ -3612,7 +3633,7 @@ boolean G_CheckDemoStatus (void)
 	}
     } 
 	 
-    return false; 
+    return false;
 } 
  
 //

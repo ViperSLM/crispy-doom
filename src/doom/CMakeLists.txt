@@ -1,6 +1,5 @@
-set(VSLM_UTIL vslm.c)
 set(LUA_DOOM)
-if(${ENABLE_LUA})
+if(ENABLE_LUA)
     set(LUA_DOOM l_doom.c)
 endif()
 
@@ -86,9 +85,10 @@ add_library(doom STATIC
             st_stuff.c      st_stuff.h
             v_snow.c        v_snow.h
             wi_stuff.c      wi_stuff.h
-            ${VSLM_UTIL}    ${LUA_DOOM} )
+            ${LUA_DOOM} )
 
-target_include_directories(doom PRIVATE "../" "${CMAKE_CURRENT_BINARY_DIR}/../../" ${LUA_INCLUDE_DIR})
+target_include_directories(doom PRIVATE "../vslm" "../" "${CMAKE_CURRENT_BINARY_DIR}/../../" ${LUA_INCLUDE_DIR})
+
 target_link_libraries(doom SDL2::SDL2)
 if(ENABLE_SDL2_MIXER)
     target_link_libraries(doom SDL2_mixer::SDL2_mixer)

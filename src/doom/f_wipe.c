@@ -27,6 +27,8 @@
 
 #include "f_wipe.h"
 
+#include <vslm.h>
+
 //
 //                       SCREEN WIPE PACKAGE
 //
@@ -38,6 +40,15 @@ static pixel_t*	wipe_scr_start;
 static pixel_t*	wipe_scr_end;
 static pixel_t*	wipe_scr;
 
+int M_CheckParm(const char *check);
+
+int wipe_random(void)
+{
+    if (M_CheckParm("-oldrng"))
+        return M_Random();
+
+    return VSLM_DoomRand();
+}
 
 void
 wipe_shittyColMajorXform
@@ -148,10 +159,10 @@ wipe_initMelt
     // setup initial column positions
     // (y<0 => not ready to scroll yet)
     y = (int *) Z_Malloc(width*sizeof(int), PU_STATIC, 0);
-    y[0] = -(M_Random()%16);
+    y[0] = -(wipe_random()%16);
     for (i=1;i<width;i++)
     {
-	r = (M_Random()%3) - 1;
+	r = (wipe_random()%3) - 1;
 	y[i] = y[i-1] + r;
 	if (y[i] > 0) y[i] = 0;
 	else if (y[i] == -16) y[i] = -15;

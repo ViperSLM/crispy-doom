@@ -195,35 +195,29 @@ DoomEnums.MobjType = {
 }
 
 -- Map object struct
-DoomStructs.Mobj = {}
-DoomStructs.Mobj.__index = DoomStructs.Mobj -- Sets up method lookup
+DoomStructs.Mobj = {x = 0, y = 0, z = 0, angle = 0, mobjtype = 0, memAddr = 0x00}
+--DoomStructs.Mobj.__index = DoomStructs.Mobj -- Sets up method lookup
 
-function DoomStructs.Mobj.new(x, y, z, angle, mobjtype, memaddr)
-    local self = setmetatable({}, DoomStructs.Mobj)
-    self.x = x
-    self.y = y
-    self.z = z
-    self.angle = angle
-    self.mobjtype = mobjtype
-    self.memAddr = memaddr
-
-    self.printInfo = function()
-        print("\nNPC Info:\nX = " ..
-        self.x ..
-        "\nY = " ..
-        self.y ..
-        "\nZ = " .. self.z .. "\nAngle = " ..
-        self.angle .. "\nMobjType = " .. self.mobjtype .. "\nMemory Addr = " .. self.memAddr)
-    end
+function DoomStructs.Mobj:Create(out)
+    out.parent = self
+    return out
 end
 
--- DoomStructs.MObj = {
---     -- Coordinates
---     x = 0,y = 0,z = 0,
+function DoomStructs.Mobj:PrintInfo()
+    --print("Hello World!")
+    -- print("\nNPC Info:\nX = " ..
+    --     self.x ..
+    --     "\nY = " ..
+    --     self.y ..
+    --     "\nZ = " .. self.z .. "\nAngle = " ..
+    --     self.angle .. "\nMobjType = " .. self.mobjtype .. "\nMemory Addr = " .. self.memAddr)
+end
 
---     -- Angle
---     angle = 0,
 
---     -- Object type
---     mobjtype,
--- }
+function OnGlobalMapLoad()
+    --print("Monsters randomized: ".. Doom.RandomizeMonsters(false))
+end
+
+function OnGlobalMapExit()
+   --Doom.ClearRandoPool();
+end

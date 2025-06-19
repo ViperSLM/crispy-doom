@@ -14,11 +14,14 @@
 #include "g_game.h"
 #include "r_defs.h"
 
+#include <vslm.h>
+
 void ST_PrintMsg(const char *format, ...);
+int M_snprintf(char *buf, size_t buf_len, const char *s, ...);
 
 extern lua_State *lvm;
 extern void L_LoadLib(lua_CFunction func);
-extern void L_LoadScript(const char *script);
+extern void L_LoadScript(const char *script, const char *entry);
 
 int luaopen_doom(lua_State *L);
 
@@ -26,7 +29,6 @@ int luaopen_doom(lua_State *L);
 void L_Setup(void)
 {
     L_LoadLib(luaopen_doom);
-    L_LoadScript("DOOM");
 }
 
 void L_RunMainFunction(void)
@@ -46,8 +48,8 @@ int L_G_ExitLevel(lua_State *L)
 
 int L_S_ChangeMusic(lua_State *L)
 {
-    int musicid = lua_tointeger(lvm, 1);
-    int looping = lua_tointeger(lvm, 2);
+    int musicid = (musicenum_t) lua_tointeger(lvm, 1);
+    int looping = (int) lua_tointeger(lvm, 2);
     S_ChangeMusic(musicid, looping);
     S_StartMusic(musicid);
     return 0;
@@ -62,22 +64,21 @@ int L_ST_PrintMsg(lua_State *L)
 
 int L_P_SpawnMobj(lua_State *L)
 {
-    fixed_t x,y,z;
+    fixed_t x,y;
     mobjtype_t type;
     mobj_t *actor; // Fog is used for the teleport effect
     subsector_t *subsector;
 
-    x = lua_tointeger(L, 1);
-    y = lua_tointeger(L, 2);
-    z = ONFLOORZ;
-    type = lua_tointeger(L, 3);
+    x = (fixed_t)lua_tointeger(L, 1);
+    y = (fixed_t)lua_tointeger(L, 2);
+    type = (mobjtype_t) lua_tointeger(L, 3);
     //z = lua_tointeger(L, 3); // Maybe Z can be overidden
 
     subsector = R_PointInSubsector(x, y);
     actor = P_SpawnMobj(x, y, subsector->sector->floorheight, MT_TFOG);
     S_StartSound(actor, sfx_telept);
 
-    actor = P_SpawnMobj(x, y, z, type);
+    actor = P_SpawnMobj(x, y, subsector->sector->floorheight, type);
 
     lua_pushinteger(L, actor->x);
     lua_pushinteger(L, actor->y);
@@ -93,7 +94,7 @@ int L_Linedef_OpenDoor(lua_State *L)
 {
     line_t line;
     // Get linedef tag from input
-    line.tag = lua_tointeger(lvm, 1);
+    line.tag = (short)lua_tointeger(lvm, 1);
     EV_DoDoor(&line, vld_open);
     return 0;
 }
@@ -102,7 +103,7 @@ int L_Linedef_CloseDoor(lua_State *L)
 {
     line_t line;
     // Get linedef tag from input
-    line.tag = lua_tointeger(lvm, 1);
+    line.tag = (short)lua_tointeger(lvm, 1);
     EV_DoDoor(&line, vld_close);
     return 0;
 }
@@ -111,15 +112,53 @@ int L_Sector_LightLevel(lua_State *L)
 {
     line_t line;
     int lightlevel;
-    line.tag = lua_tointeger(lvm, 1);       // Sector tag
-    lightlevel = lua_tointeger(lvm, 2); // Light level to change to
+    line.tag = (short)lua_tointeger(lvm, 1); // Sector tag
+    lightlevel = (int)lua_tointeger(lvm, 2); // Light level to change to
 
     EV_LightTurnOn(&line, lightlevel);
-    if(M_CheckParm("-vslmdebug"))
-    {
-        DEH_printf("[VSLM DEBUG] L_Sector_Lightlevel: Tag = %d, Light level = %d\n", line.tag, lightlevel);
-    }
+    VSLM_DEBUG("L_Sector_Lightlevel: Tag = %d, Light level = %d", line.tag, lightlevel);
     return 0;
+}
+
+// Monster randomizer (this could be fun)
+int L_Map_RandomizeMonsters(lua_State* L)
+{
+    boolean spawnfog = lua_toboolean(L, 1);
+    int count = VSLM_RandomizeMonsters(spawnfog);
+
+    lua_pushinteger(lvm, count);
+    return 1;
+}
+
+// Clear randomizer pool
+int L_Map_ClearRandoPool(lua_State* L)
+{
+    VSLM_ClearRandoPool();
+    return 0;
+}
+
+int L_Map_ToggleRandoChaos(lua_State* L)
+{
+    RAND_CHAOS = (!RAND_CHAOS) ? true : false;
+    
+    char msg[64];
+    M_snprintf(msg, sizeof(msg), "Enemy Randomizer: Chaos mode %s",
+               (RAND_CHAOS) ? "ON" : "OFF");
+
+    lua_getglobal(L, "print");
+    if (lua_isfunction(L, -1))
+    {
+        lua_pushstring(L, msg);
+        lua_pcall(L, 1, 0, 0);
+    }
+
+    return 0;
+}
+
+int L_Map_GetRandoChaos(lua_State* L)
+{
+    lua_pushboolean(L, RAND_CHAOS);
+    return 1;
 }
 
 /* ------------------------------------ */
@@ -132,6 +171,10 @@ static const luaL_Reg doomLib[] = {
     {"OpenDoor", L_Linedef_OpenDoor},
     {"CloseDoor", L_Linedef_CloseDoor},
     {"SectorLightLevel", L_Sector_LightLevel},
+    {"RandomizeMonsters", L_Map_RandomizeMonsters},
+    {"ClearRandoPool", L_Map_ClearRandoPool},
+    {"ToggleRandoChaos", L_Map_ToggleRandoChaos},
+    {"GetRandoChaos", L_Map_GetRandoChaos},
     {NULL, NULL}
 };
 
@@ -148,6 +191,28 @@ int luaopen_doom(lua_State *L)
 void L_Event_MapLoad(void)
 {
     lua_getglobal(lvm, "OnMapLoad");
+    if (lua_isfunction(lvm, -1))
+        lua_pcall(lvm, 0, 0, 0);
+}
+
+void L_Event_GlobalMapLoad(void)
+{
+    lua_getglobal(lvm, "OnGlobalMapLoad");
+    if (lua_isfunction(lvm, -1))
+        lua_pcall(lvm, 0, 0, 0);
+}
+
+
+void L_Event_MapExit(void)
+{
+    lua_getglobal(lvm, "OnMapExit");
+    if (lua_isfunction(lvm, -1))
+        lua_pcall(lvm, 0, 0, 0);
+}
+
+void L_Event_GlobalMapExit(void)
+{
+    lua_getglobal(lvm, "OnGlobalMapExit");
     if (lua_isfunction(lvm, -1))
         lua_pcall(lvm, 0, 0, 0);
 }

@@ -1,9 +1,9 @@
 -- MAP01 Test script
---LoadScript("DOOM")
 
 function OnMapLoad()
-	print("Hello from MAP01!")
+	--print("Hello from MAP01!")
 	--Doom.G_ExitLevel()
+	--Doom.RandomizeMonsters(true)
 end
 
 -- Activates when switch is pressed
@@ -191,9 +191,12 @@ function OnSwitchActivate(tag)
 	if tag == 0 then
 		-- local rng = math.random(62, 96)
 		-- Doom.S_ChangeMusic(rng, true)
-		local actorx,actory,actorz,angle,mobjtype,memaddr = Doom.P_SpawnMobj(568,-260,DoomEnums.MobjType.MT_POSSESSED)
-		local npc = DoomStructs.Mobj.new(actorx,actory,actorz,angle,mobjtype,memaddr)
+		--local actorx,actory,actorz,angle,mobjtype,memaddr = Doom.P_SpawnMobj(35006481,-16307867,DoomEnums.MobjType.MT_POSSESSED)
+		--local npc = DoomStructs.Mobj.new(actorx,actory,actorz,angle,mobjtype,memaddr)
 
-		npc.printInfo()
+		local actor = math.random(1, 23)
+		local npc = DoomStructs.Mobj:Create(Doom.P_SpawnMobj(35006481,-16307867,actor))
+
+		npc:PrintInfo()
 	end
 end

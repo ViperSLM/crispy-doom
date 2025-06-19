@@ -47,6 +47,8 @@
 
 #include "i_lua.h"
 
+#include <vslm.h>
+
 void	P_SpawnMapThing (mapthing_t*	mthing);
 
 
@@ -1192,6 +1194,7 @@ P_SetupLevel
     musinfo.from_savegame = false;
 
     Z_FreeTags (PU_LEVEL, PU_PURGELEVEL-1);
+    VSLM_ClearRandoPool();
 
     // UNUSED W_Profile ();
     P_InitThinkers ();

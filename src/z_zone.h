@@ -62,6 +62,12 @@ void    Z_ChangeUser(void *ptr, void **user);
 int     Z_FreeMemory (void);
 unsigned int Z_ZoneSize(void);
 
+// [ViperSLM]
+// Check if pointer is still allocated with the specific tag.
+// Returns 1 if allocated, 0 for not.
+// Used for debugging purposes.
+int Z_Allocated(void *ptr, int tag);
+
 //
 // This is used to get the local FILE:LINE info from CPP
 // prior to really call the function in question.

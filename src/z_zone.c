@@ -557,3 +557,15 @@ unsigned int Z_ZoneSize(void)
     return mainzone->size;
 }
 
+// [ViperSLM]
+// Z_Allocated
+int Z_Allocated (void* ptr, int tag)
+{
+    memblock_t *block;
+    for (block = mainzone->blocklist.next; block != &mainzone->blocklist; block = block->next)
+    {
+        if (block->user == ptr && block->tag == tag)
+            return 1; // Still allocated
+    }
+    return 0;
+}

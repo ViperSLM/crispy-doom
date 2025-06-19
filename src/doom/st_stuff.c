@@ -67,7 +67,8 @@ extern int screenblocks;      // [crispy] for the Crispy HUD
 extern boolean inhelpscreens; // [crispy] prevent palette changes
 
 // VSLM utils externs
-extern void VSLM_ReviveMonsters(int *outReviveCount);
+#include <vslm.h>
+
 
 //
 // STATUS BAR DATA
@@ -370,14 +371,15 @@ cheatseq_t cheat_version = CHEAT("version", 0); // [crispy] Russian Doom
 cheatseq_t cheat_skill = CHEAT("skill", 0);
 cheatseq_t cheat_snow = CHEAT("letitsnow", 0);
 
-cheatseq_t cheat_revive = CHEAT("revive", 0); // ViperSLM
-cheatseq_t cheat_tag666 = CHEAT("sixsixsix", 0); // ViperSLM
-
-extern void VSLM_TriggerTag666(boolean tag667);
+cheatseq_t cheat_revive = CHEAT("revive", 0); // ViperSLM: Revive all enemies in map
+cheatseq_t cheat_tag666 = CHEAT("sixsixsix", 0); // ViperSLM: Trigger Tag 666/667 events in map
+cheatseq_t cheat_playerpos = CHEAT("vslmxyz", 0); // ViperSLM: Print player's coordinates (X,Y,Z) to console
+cheatseq_t cheat_rando = CHEAT("vslmzfg", 0); // ViperSLM: Randomize enemies in current map
+cheatseq_t cheat_randochaos = CHEAT("vslmcrazy", 0); // ViperSLM: Toggle Chaos mode for enemy randomizer
 
 static char msg[ST_MSGWIDTH];
 
-// Added by ViperSLM
+// ViperSLM: Print to HUD, printf-style
 void ST_PrintMsg(const char *format, ...)
 {
 	va_list args;
@@ -385,6 +387,15 @@ void ST_PrintMsg(const char *format, ...)
 	M_vsnprintf(msg, sizeof(msg), format, args);
 	va_end(args);
 	plyr->message = msg;
+}
+
+// ViperSLM: Use custom RNG
+int ST_Random(void)
+{
+    if (M_CheckParm("-oldrng"))
+        return M_Random();
+
+    return VSLM_DoomRand();
 }
 
 // [crispy] restrict cheat usage
@@ -948,8 +959,7 @@ boolean ST_Responder(event_t *ev)
 			// Revive all enemies
             else if (cht_CheckCheatSP(&cheat_revive, ev->data2))
             {
-				int revivecount;
-				VSLM_ReviveMonsters(&revivecount);
+				int revivecount = VSLM_ReviveMonsters();
 				M_snprintf(msg, sizeof(msg), "%s%d %sMonster%s revived", crstr[CR_GOLD], revivecount, crstr[CR_NONE], (revivecount == 1) ? "" : "s");
 				plyr->message = msg;
             }
@@ -959,6 +969,22 @@ boolean ST_Responder(event_t *ev)
 				VSLM_TriggerTag666(false);
 				if (gamemode == commercial && gamemap == 7)
 				  VSLM_TriggerTag666(true); // Trigger Tag 667 if on Doom II's MAP07
+            }
+            else if (cht_CheckCheatSP(&cheat_playerpos, ev->data2))
+            {
+                DEH_printf("Player's coordinates: X - %d, Y - %d, Z - %d\n",
+                           plyr->mo->x, plyr->mo->y, plyr->mo->z);
+            }
+            else if (cht_CheckCheatSP(&cheat_rando, ev->data2))
+            {
+                int randocount = VSLM_RandomizeMonsters(true);
+                ST_PrintMsg("%d monsters randomized", randocount);
+            }
+            else if (cht_CheckCheatSP(&cheat_randochaos, ev->data2))
+            {
+                RAND_CHAOS = (!RAND_CHAOS) ? true : false;
+                ST_PrintMsg("EnemyRando: Chaos mode %s",
+                            (RAND_CHAOS) ? "ON" : "OFF");
             }
             // [crispy] implement PrBoom+'s "notarget" cheat
             else if (cht_CheckCheatSP(&cheat_notarget, ev->data2) ||
@@ -1635,7 +1661,7 @@ static void ST_doPaletteStuff(void);
 void ST_Ticker(void)
 {
 
-    st_randomnumber = M_Random();
+    st_randomnumber = ST_Random();
     ST_updateWidgets();
     st_oldhealth = plyr->health;
 

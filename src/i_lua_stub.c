@@ -12,3 +12,5 @@ void L_LoadLib(lua_CFunction func) {}
 
 void L_Event_LinedefSwitchActivate(line_t *line) {}
 void L_Event_MapLoad(void) {}
+void L_Event_GlobalMapLoad(void) {}
+void L_Event_GlobalMapExit(void) {}

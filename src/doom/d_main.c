@@ -83,7 +83,8 @@
 
 // Lua bindings
 #include "i_lua.h"
-extern int luaopen_doom(lua_State *L);
+int luaopen_doom(lua_State *L);
+
 
 //
 // D-DoomLoop()
@@ -2123,7 +2124,7 @@ void D_DoomMain (void)
     I_InitJoystick();
     I_InitSound(doom);
     I_InitMusic();
-    
+
     // Start Lua
     I_InitLua();
 

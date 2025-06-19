@@ -13,16 +13,26 @@ void L_Start(void);
 void L_Stop(void);
 void L_Setup(void); // Different, depending on the game
 void L_DefaultLibs(void);
-void L_LoadScript(const char *script);
+void L_LoadScript(const char *script, const char *entry);
 void L_RunMainFunction(void); // Different, depending on the game
 
 /* -- Lua events -- */
 
+
 // Run OnSwitchActivate (output)
 void L_Event_LinedefSwitchActivate(line_t *line);
 
-// Run OnMapLoad
+// Run on map load
 void L_Event_MapLoad(void);
+
+// Run on map load (Global)
+void L_Event_GlobalMapLoad(void);
+
+// Runs on map exit
+void L_Event_MapExit(void);
+
+// Runs on map exit (Global)
+void L_Event_GlobalMapExit(void);
 
 /* ---------------- */
 
@@ -50,7 +60,7 @@ void L_LoadLib(lua_CFunction func);
     L_Start(); \
     L_DefaultLibs(); \
     L_Setup(); \
-    L_LoadScript("MAIN"); \
+    L_LoadScript("MAIN", "Main"); \
     L_RunMainFunction(); \
     I_AtExit(L_Stop, false)
     
