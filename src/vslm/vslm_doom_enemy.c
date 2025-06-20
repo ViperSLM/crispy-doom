@@ -146,6 +146,14 @@ void VSLM_SpawnFire(mobj_t *actor)
 }
 
 // ------------------------
+// VSLM_IsMonster
+// ------------------------
+boolean VSLM_IsMonster(mobj_t *actor)
+{
+    return (actor->flags & MF_COUNTKILL || actor->type == MT_SKULL);
+}
+
+// ------------------------
 // VSLM_IsMonsterGibbed
 // ------------------------
 boolean VSLM_IsMonsterGibbed(mobj_t *actor)
@@ -187,13 +195,13 @@ const char* VSLM_GetMonsterType(mobjtype_t type)
     switch (type)
     {
         case MT_POSSESSED:
-            return "Former human";
+            return "Zombieman";
 
         case MT_SHOTGUY:
-            return "Former sergeant";
+            return "Shotgun Guy";
 
         case MT_CHAINGUY:
-            return "Former commando";
+            return "Heavy Weapons Guy";
 
         case MT_TROOP:
             return "Imp";
@@ -268,49 +276,13 @@ boolean VSLM_MonsterFound(mobjtype_t type)
 }
 
 // ------------------------
-// VSLM_GetRandomMonster
-// ------------------------
-mobj_t *VSLM_GetRandomMonster(mobjtype_t *type)
-{
-    thinker_t *th;
-    mobj_t *actor, *selected;
-    do
-    {
-        for (th = thinkercap.next; th != &thinkercap; th = th->next)
-        {
-            if (th->function.acp1 != (actionf_p1) P_MobjThinker)
-                continue;
-            actor = (mobj_t *) th;
-            if (actor->flags & MF_COUNTKILL || actor->type == MT_SKULL)
-            {
-                if (type)
-                {
-                    if (actor->type == *type)
-                    {
-                        selected = actor;
-                        if (VSLM_DoomRand() == 255)
-                            return selected;
-                    }
-                }
-                else
-                {
-                    selected = actor;
-                    if (VSLM_DoomRand() == 255)
-                        return selected;
-                }
-            }
-        }
-    } while (VSLM_DoomRand() != 255);
-    return selected;
-}
-
-// ------------------------
 // VSLM_ChangeMonsterType
 // ------------------------
 void VSLM_ChangeMonsterType(mobj_t* actor, mobjtype_t type)
 {
     // Retain ambush flag if any
     int ambush = (actor->flags & MF_AMBUSH) ? MF_AMBUSH : 0;
+    mobjtype_t oldtype = actor->type;
 
     actor->type = type;
     actor->info = &mobjinfo[type];
@@ -318,6 +290,11 @@ void VSLM_ChangeMonsterType(mobj_t* actor, mobjtype_t type)
     actor->health = actor->info->spawnhealth;
     if (ambush != 0)
         actor->flags ^= ambush;
+
+    if(oldtype == MT_SKULL)
+        actor->flags &= ~MF_COUNTKILL;
+    else if(actor->type == MT_SKULL)
+        actor->flags ^= MF_COUNTKILL;
 
     P_SetMobjState(actor, actor->info->spawnstate);
 }

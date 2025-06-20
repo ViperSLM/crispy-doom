@@ -16,9 +16,10 @@
 */
 #ifndef _VSLM_H_
 #define _VSLM_H_
+#include <doomtype.h>
 #include <deh_str.h>
 #include <m_argv.h>
-#include <doomtype.h>
+#include <doom/p_mobj.h>
 #include <stdint.h>
 
 // Determine whether to use 32 or 64 bits (set via CMake)
@@ -34,12 +35,6 @@
 		DEH_printf("[VSLM DEBUG]: "); \
 		DEH_printf(x, ##__VA_ARGS__); \
 		DEH_printf("\n")
-
-/* -------------------- */
-/* Forward Declarations */
-typedef struct mobj_s mobj_t;
-typedef enum mobjtype_e mobjtype_t;
-/* -------------------- */
 
 /* ----------------------------------- */
 /* Random Number Generator ----------- */
@@ -78,6 +73,9 @@ int VSLM_ReviveMonsters(void);
 // Does nothing in DOOM/Ultimate DOOM.
 void VSLM_SpawnFire(mobj_t *actor);
 
+// Is Mobj an enemy?
+boolean VSLM_IsMonster(mobj_t *actor);
+
 // Has a monster been gibbed?
 boolean VSLM_IsMonsterGibbed(mobj_t *actor);
 
@@ -87,19 +85,12 @@ const char *VSLM_GetMonsterType(mobjtype_t type);
 // Is specific monster found in map?
 boolean VSLM_MonsterFound(mobjtype_t type);
 
-// Select random monster in map
-mobj_t *VSLM_GetRandomMonster(mobjtype_t *type);
-
 // Change Mobj to selected type
 void VSLM_ChangeMonsterType(mobj_t *actor, mobjtype_t type);
 
 /* ----------------------------------- */
 /* Randomizer Functions -------------- */
 /* ----------------------------------- */
-
-// Chaos mode. When set to true, monsters (except bosses)
-// are randomized regardless of their tier.
-extern boolean RAND_CHAOS;
 
 // Randomize all monsters in current map.
 // 'spawnfog' variable spawns a fire effect
@@ -108,18 +99,12 @@ extern boolean RAND_CHAOS;
 // Returns the amount of monsters randomized.
 int VSLM_RandomizeMonsters(boolean spawnfog);
 
-// Is actor a tier 2 monster?
-boolean VSLM_IsTier2Monster(mobj_t *actor);
-
-// Is actor a tier 3 monster?
-boolean VSLM_IsTier3Monster(mobj_t *actor);
-
-// Is actor a boss monster? (Spider Mastermind/Cyberdemon)
-boolean VSLM_IsBossMonster(mobj_t *actor);
-
 // Set randomizer pool pointer to NULL
 // Doom's zone memory allocator takes
 // care of freeing this (PU_LEVEL).
 void VSLM_ClearRandoPool(void);
+
+// Select random monster in map
+mobj_t *VSLM_Rando_GetMonster(mobjtype_t *type);
 
 #endif

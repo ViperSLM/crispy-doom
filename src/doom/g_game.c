@@ -85,6 +85,7 @@
 #include "i_lua.h"
 
 #include <vslm.h>
+#include <vslm_doom_randomizer.h>
 
 #define SAVEGAMESIZE	0x2c000
 
@@ -1129,15 +1130,17 @@ void G_DoLoadLevel (void)
     // break demo compatibility
     if (oldgamestate != GS_DEMOSCREEN && (!demoplayback && !demorecording))
     {
-        // Randomizer + Chaos Mode
-        if (M_CheckParm("-chaos"))
-            RAND_CHAOS = true;
-        if (M_CheckParm("-randomizer"))
-            VSLM_RandomizeMonsters(false);
-
+        
         // OnGlobalMapLoad + OnMapLoad Lua events
         L_Event_GlobalMapLoad();
         L_LoadScript(maplumpinfo->name, "OnMapLoad");
+
+        // Randomizer + Chaos Mode
+        if (M_CheckParm("-chaos"))
+            RAND_CHAOS = true;
+
+        if(RANDOMIZER)
+            VSLM_RandomizeMonsters(false);
     }
 } 
 

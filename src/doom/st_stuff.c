@@ -66,8 +66,9 @@
 extern int screenblocks;      // [crispy] for the Crispy HUD
 extern boolean inhelpscreens; // [crispy] prevent palette changes
 
-// VSLM utils externs
+// Randomizer
 #include <vslm.h>
+#include <vslm_doom_randomizer.h>
 
 
 //
@@ -375,7 +376,8 @@ cheatseq_t cheat_revive = CHEAT("revive", 0); // ViperSLM: Revive all enemies in
 cheatseq_t cheat_tag666 = CHEAT("sixsixsix", 0); // ViperSLM: Trigger Tag 666/667 events in map
 cheatseq_t cheat_playerpos = CHEAT("vslmxyz", 0); // ViperSLM: Print player's coordinates (X,Y,Z) to console
 cheatseq_t cheat_rando = CHEAT("vslmzfg", 0); // ViperSLM: Randomize enemies in current map
-cheatseq_t cheat_randochaos = CHEAT("vslmcrazy", 0); // ViperSLM: Toggle Chaos mode for enemy randomizer
+cheatseq_t cheat_randochaos = CHEAT("chaoscontrol", 0); // ViperSLM: Toggle Chaos mode for enemy randomizer
+cheatseq_t cheat_randotoggle = CHEAT("random", 0); // ViperSLM: Toggle randomizer on map load.
 
 static char msg[ST_MSGWIDTH];
 
@@ -983,8 +985,14 @@ boolean ST_Responder(event_t *ev)
             else if (cht_CheckCheatSP(&cheat_randochaos, ev->data2))
             {
                 RAND_CHAOS = (!RAND_CHAOS) ? true : false;
-                ST_PrintMsg("EnemyRando: Chaos mode %s",
+                ST_PrintMsg("Randomizer Chaos mode %s",
                             (RAND_CHAOS) ? "ON" : "OFF");
+            }
+            else if (cht_CheckCheatSP(&cheat_randotoggle, ev->data2))
+            {
+                RANDOMIZER = (!RANDOMIZER) ? true : false;
+                ST_PrintMsg("Enemy Randomizer %s (restart map)",
+                            (RANDOMIZER) ? "ON" : "OFF");
             }
             // [crispy] implement PrBoom+'s "notarget" cheat
             else if (cht_CheckCheatSP(&cheat_notarget, ev->data2) ||

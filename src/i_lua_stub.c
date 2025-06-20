@@ -5,7 +5,7 @@ void L_Start(void) {}
 void L_Stop(void) {}
 void L_Setup(void) {}
 void L_DefaultLibs(void) {}
-void L_LoadScript(const char *mapName) {}
+void L_LoadScript(const char *script, const char *entry) {}
 void L_RunMainFunction(void) {}
 
 void L_LoadLib(lua_CFunction func) {}

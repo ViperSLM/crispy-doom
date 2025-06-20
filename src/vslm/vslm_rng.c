@@ -52,22 +52,23 @@ xorstate_t *rngstate;
 void VSLM_SetRandomSeed(VSLM_INTSIZE seed)
 {
     int i;
+    VSLM_INTSIZE t;
     if (!rngstate)
     {
         DEH_printf("VSLM_SetRandomSeed: Allocating memory for random seed "
-                   "(Size: %u bytes)\n",
+                   "(Size: %lu bytes)\n",
                    sizeof(xorstate_t));
         rngstate = Z_Malloc(sizeof(xorstate_t), PU_STATIC, NULL);
         I_AtExit(VSLM_FreeSeed, false);
     }
 
-    DEH_printf("VSLM_SetRandomSeed: Setting random seed to %u\n", seed);
-#ifdef VSLM_64BIT
+    #ifdef VSLM_64BIT
+    DEH_printf("VSLM_SetRandomSeed: Setting random seed to %llu\n", seed);
     for (i = 0; i < 4; i++)
     {
         // Golden ratio-related constant
         seed += 0x9e3779b97f4a7c15;
-        uint64_t t = seed;
+        t = seed;
         t ^= t >> 30;
         t *= 0xbf58476d1ce4e5b9;
         t ^= t >> 27;
@@ -76,11 +77,12 @@ void VSLM_SetRandomSeed(VSLM_INTSIZE seed)
         rngstate->s[i] = t;
     }
 #else
+    DEH_printf("VSLM_SetRandomSeed: Setting random seed to %u\n", seed);
     for (i = 0; i < 5; i++)
     {
         // Golden ratio-related constant
         seed += 0x9e3779b9;
-        uint32_t t = seed;
+        t = seed;
         t ^= t >> 16;
         t *= 0x85ebca6b;
         t ^= t >> 13;
@@ -103,6 +105,13 @@ void VSLM_SetRandomSeed(VSLM_INTSIZE seed)
 // Xorshift algorithm (xoshiro256++ for 64-bit, xorwow for 32-bit)
 VSLM_INTSIZE VSLM_XOR_Shift(void)
 {
+#ifdef VSLM_64BIT
+    VSLM_INTSIZE *s;
+    VSLM_INTSIZE result, t;
+#else
+    VSLM_INTSIZE t, s;
+#endif
+
 	// Generate random seed on first run
     if (!rngstate)
     {
@@ -111,9 +120,9 @@ VSLM_INTSIZE VSLM_XOR_Shift(void)
 
 #ifdef VSLM_64BIT
     /* xoshiro256++ algorithm */
-    VSLM_INTSIZE *s = rngstate->s;
-    VSLM_INTSIZE const result = rol64(s[0] + s[3], 23) + s[0];
-    VSLM_INTSIZE const t = s[1] << 17;
+    s = rngstate->s;
+    result = rol64(s[0] + s[3], 23) + s[0];
+    t = s[1] << 17;
 
     s[2] ^= s[0];
     s[3] ^= s[1];
@@ -126,10 +135,10 @@ VSLM_INTSIZE VSLM_XOR_Shift(void)
     return result;
 #else
     /* xorwow algorithm */
-    VSLM_INTSIZE t = rngstate->x[4];
+    t = rngstate->x[4];
 
     // Contrived 32-bit rotate
-    VSLM_INTSIZE s = rngstate->x[0];
+    s = rngstate->x[0];
     rngstate->x[4] = rngstate->x[3];
     rngstate->x[3] = rngstate->x[2];
     rngstate->x[2] = rngstate->x[1];
@@ -142,21 +151,6 @@ VSLM_INTSIZE VSLM_XOR_Shift(void)
     rngstate->counter += 362437;
     return t + rngstate->counter;
 #endif
-
-//    VSLM_INTSIZE x = *rngstate;
-//#ifdef VSLM_64BIT
-//    // Xorshift64
-//    x ^= x << 13;
-//    x ^= x >> 7;
-//    x ^= x << 17;
-//#else
-//    // Xorshift32
-//    x ^= x << 13;
-//    x ^= x >> 17;
-//    x ^= x << 5;
-//#endif
-//    *rngstate = x;
-//    return x;
 }
 
 int VSLM_Rand(int min, int max)

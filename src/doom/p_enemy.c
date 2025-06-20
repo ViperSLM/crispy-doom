@@ -1582,6 +1582,9 @@ A_PainShootSkull
 		
     newmobj = P_SpawnMobj (x , y, z, MT_SKULL);
 
+    // [ViperSLM]: Do not randomize
+    newmobj->norandom = true;
+
     // Check for movements.
     if (!P_TryMove (newmobj, newmobj->x, newmobj->y))
     {
