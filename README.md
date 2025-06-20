@@ -16,9 +16,12 @@ This branch is based on the 7.0 release of [Crispy Doom](https://github.com/fabi
 * Tag 666/667 events are stored inside of it's own function (VSLM_TriggerTag666)
 
 * Support for scripts which can be loaded from a WAD or as a loose file,
-  powered by Lua (LuaJIT v2.1)
+  powered by Lua (either Lua or LuaJIT)
 
-* All new functions added are inside of it's own source file (vslm.c) and are called
+* Enemy randomizer which can be enabled by typing the cheat 'random' and then
+  starting a new game
+
+* All new functions added are inside of it's own source files (in the vslm folder) and are called
   through externs. Functions related to Lua are prefixed with 'L_' and are stored in it's own source
   files (i_lua.h and i_lua.c)
 
