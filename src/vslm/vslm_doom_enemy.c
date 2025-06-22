@@ -28,6 +28,27 @@
 boolean VSLM_IsMonsterGibbed(mobj_t *actor);
 
 // ------------------------
+// VSLM_CountEnemiesInMap
+// ------------------------
+int VSLM_CountEnemiesInMap(void)
+{
+    int count;
+    thinker_t *th;
+    mobj_t *actor;
+
+    count = 0;
+    for (th = thinkercap.next; th != &thinkercap; th = th->next)
+    {
+        if (th->function.acp1 != (actionf_p1) P_MobjThinker)
+            continue; // Nope
+
+        if (VSLM_IsMonster((mobj_t *) th))
+            count++;
+    }
+    return count;
+}
+
+// ------------------------
 // VSLM_RespawnMonster
 // ------------------------
 void VSLM_RespawnMonster(mobj_t* actor)
@@ -150,7 +171,9 @@ void VSLM_SpawnFire(mobj_t *actor)
 // ------------------------
 boolean VSLM_IsMonster(mobj_t *actor)
 {
-    return (actor->flags & MF_COUNTKILL || actor->type == MT_SKULL);
+    // Don't count Commander Keen as an enemy
+    return ((actor->flags & MF_COUNTKILL && actor->type != MT_KEEN) ||
+            actor->type == MT_SKULL);
 }
 
 // ------------------------

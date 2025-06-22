@@ -1194,7 +1194,6 @@ P_SetupLevel
     musinfo.from_savegame = false;
 
     Z_FreeTags (PU_LEVEL, PU_PURGELEVEL-1);
-    VSLM_ClearRandoPool();
 
     // UNUSED W_Profile ();
     P_InitThinkers ();

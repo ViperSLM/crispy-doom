@@ -50,7 +50,7 @@ int VSLM_Rand(int min, int max);
 int VSLM_DoomRand(void);
 
 /* ----------------------------------- */
-/* Map Functions ------------------- */
+/* Map Functions --------------------- */
 /* ----------------------------------- */
 
 // Trigger Tag 666/667 events in current map
@@ -59,6 +59,13 @@ void VSLM_TriggerTag666(boolean tag667);
 /* ----------------------------------- */
 /* Enemy Functions ------------------- */
 /* ----------------------------------- */
+
+// Returns the total amount of enemies in
+// the map (includes Lost Souls)
+// --
+// If type is set to MT_NULL, all enemies
+// are counted.
+int VSLM_CountEnemiesInMap(void);
 
 // Respawn a monster as if being resurrected by an Arch-vile.
 // Falls back to Nightmare-style respawning if Mobj pointer 
