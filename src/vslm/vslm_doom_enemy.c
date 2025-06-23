@@ -85,6 +85,7 @@ void VSLM_RespawnMonster(mobj_t* actor)
         actor->tracer = NULL;
         actor->norandom = false;
         S_StartSound(actor, sfx_slop);
+
         return;
     }
     // -- Fallback (teleport)
@@ -130,10 +131,9 @@ void VSLM_RespawnMonster(mobj_t* actor)
 // ------------------------
 // VSLM_ReviveMonsters
 // ------------------------
-int VSLM_ReviveMonsters(void)
+void VSLM_ReviveMonsters(void)
 {
     thinker_t *th;
-    int count = 0;
     for (th = thinkercap.next; th != &thinkercap; th = th->next)
     {
         if (th->function.acp1 == (actionf_p1) P_MobjThinker)
@@ -148,11 +148,9 @@ int VSLM_ReviveMonsters(void)
             if ((mo->flags & MF_COUNTKILL) && mo->health <= 0)
             {
                 VSLM_RespawnMonster(mo);
-                count++;
             }
         }
     }
-    return count;
 }
 
 // ------------------------
@@ -307,6 +305,10 @@ void VSLM_ChangeMonsterType(mobj_t* actor, mobjtype_t type)
     // Retain ambush flag if any
     int ambush = (actor->flags & MF_AMBUSH) ? MF_AMBUSH : 0;
     mobjtype_t oldtype = actor->type;
+
+    // Do not change types if 'norandom' is set to true
+    if (actor->norandom)
+        return;
 
     actor->type = type;
     actor->info = &mobjinfo[type];

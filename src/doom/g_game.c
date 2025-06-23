@@ -85,7 +85,8 @@
 #include "i_lua.h"
 
 #include <vslm.h>
-#include <vslm_doom_randologic.h>
+
+#include <vslm/vslm_doom_randomizer.h>
 
 #define SAVEGAMESIZE	0x2c000
 
@@ -1136,7 +1137,7 @@ void G_DoLoadLevel (void)
         L_LoadScript(maplumpinfo->name, "OnMapLoad");
 
         if(RANDOMIZER)
-            VSLM_StartEnemyRandomizer(false);
+            VSLM_StartRandomizer(false, NULL);
 
     }
 } 

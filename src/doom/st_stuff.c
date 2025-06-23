@@ -68,7 +68,8 @@ extern boolean inhelpscreens; // [crispy] prevent palette changes
 
 // Randomizer
 #include <vslm.h>
-#include <vslm_doom_randologic.h>
+
+#include <vslm_doom_randomizer.h>
 
 
 //
@@ -961,9 +962,9 @@ boolean ST_Responder(event_t *ev)
 			// Revive all enemies
             else if (cht_CheckCheatSP(&cheat_revive, ev->data2))
             {
-				int revivecount = VSLM_ReviveMonsters();
-				M_snprintf(msg, sizeof(msg), "%s%d %sMonster%s revived", crstr[CR_GOLD], revivecount, crstr[CR_NONE], (revivecount == 1) ? "" : "s");
-				plyr->message = msg;
+				VSLM_ReviveMonsters();
+				// M_snprintf(msg, sizeof(msg), "%s%d %sMonster%s revived", crstr[CR_GOLD], revivecount, crstr[CR_NONE], (revivecount == 1) ? "" : "s");
+				// plyr->message = msg;
             }
             else if (cht_CheckCheatSP(&cheat_tag666, ev->data2))
             {
@@ -989,7 +990,9 @@ boolean ST_Responder(event_t *ev)
             {
                 if (RANDOMIZER)
                 {
-                    VSLM_StartEnemyRandomizer(true);
+                    int randocount = 0;
+                    VSLM_StartRandomizer(true, &randocount);
+                    ST_PrintMsg("%d monsters randomized", randocount);
                 }
                 else
                     ST_PrintMsg("Randomizer not enabled.");

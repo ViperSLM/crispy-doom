@@ -14,8 +14,8 @@
 	DESCRIPTION:
 	Randomizer tiers
 */
-#ifndef _VSLM_DOOM_RANDO_TIERS_H_
-#define _VSLM_DOOM_RANDO_TIERS_H_
+#ifndef _VSLM_DOOM_RANDO_ENEMY_TIERS_H_
+#define _VSLM_DOOM_RANDO_ENEMY_TIERS_H_
 
 #include <doom/info.h>
 

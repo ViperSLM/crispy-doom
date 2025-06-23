@@ -12,12 +12,16 @@
 	GNU General Public License for more details.
 
 	DESCRIPTION:
-	Things used with randomizer functions (e.g. tier lists, flags, etc.)
+	Randomizer - Main header
 */
 #ifndef _VSLM_DOOM_RANDO_H_
 #define _VSLM_DOOM_RANDO_H_
 #include <doomtype.h>
 #include <doom/info.h>
+
+/* ----------------------------------- */
+/* Definitions ----------------------- */
+/* ----------------------------------- */
 
 // Determines whether to enable
 // the randomizer or not
@@ -26,5 +30,17 @@ extern boolean RANDOMIZER;
 // Chaos mode. When set to true, monsters (except bosses)
 // are randomized regardless of their tier.
 extern boolean RAND_CHAOS;
+
+
+/* ----------------------------------- */
+/* Function Definitions -------------- */
+/* ----------------------------------- */
+
+// Starts the randomizer by calling the related
+// functions.
+void VSLM_StartRandomizer(boolean spawnfx, int *count);
+
+// Clean up memory before a level loads
+void VSLM_ClearRandomizer(void);
 
 #endif

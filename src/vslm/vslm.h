@@ -74,7 +74,7 @@ void VSLM_RespawnMonster(mobj_t *actor);
 
 // Resurrect all monsters in the current map.
 // Returns the total amount of monsters revived.
-int VSLM_ReviveMonsters(void);
+void VSLM_ReviveMonsters(void);
 
 // Shortcut for spawning fire (MT_SPAWNFIRE).
 // Does nothing in DOOM/Ultimate DOOM.

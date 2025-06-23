@@ -22,6 +22,8 @@
 #include <math.h>
 #include <stdlib.h>
 
+#include "vslm_doom_randomizer.h"
+
 #include "z_zone.h"
 
 #include "deh_main.h"
@@ -1194,6 +1196,9 @@ P_SetupLevel
     musinfo.from_savegame = false;
 
     Z_FreeTags (PU_LEVEL, PU_PURGELEVEL-1);
+
+    // Clear randomizer stuff
+    VSLM_ClearRandomizer();
 
     // UNUSED W_Profile ();
     P_InitThinkers ();

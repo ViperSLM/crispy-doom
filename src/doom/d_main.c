@@ -82,7 +82,8 @@
 #include "doom_icon.c"
 
 
-#include "vslm_doom_randologic.h"
+#include "vslm_doom_randomizer.h"
+
 // Lua bindings
 #include "i_lua.h"
 int luaopen_doom(lua_State *L);

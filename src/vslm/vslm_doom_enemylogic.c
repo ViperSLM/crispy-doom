@@ -12,11 +12,11 @@
 	GNU General Public License for more details.
 
 	DESCRIPTION:
-	Randomizer logic (replacing the old algorithm)
+	Randomizer - Enemy logic
 */
 #include "vslm.h"
-#include "vslm_doom_randologic.h"
-#include "vslm_doom_randotiers.h"
+#include "vslm_doom_enemylogic.h"
+#include "vslm_doom_enemytiers.h"
 
 #include <doom/doomstat.h>
 #include <doom/d_think.h>
@@ -37,6 +37,7 @@ void VSLM_Rando_ClearEnemyPool(void);
 void VSLM_Rando_PopulateEnemyPool(void);
 void VSLM_Rando_PreserveEnemyType(mobjtype_t actortype);
 void VSLM_Rando_PrintEnemyStats(boolean original);
+void VSLM_Rando_ReplaceEnemy(mobj_t *actor, mobjtype_t *type);
 void VSLM_Rando_RareEnemySnd(mobj_t *actor);
 void VSLM_Rando_SetEnemyOdds(void);
 void VSLM_Rando_SetTierOdds(uint16_t t2, uint16_t t3, uint16_t t4, uint16_t t5,
@@ -55,13 +56,14 @@ boolean VSLM_Rando_PlayerInSameMap(void);
 /* Global Variables ------------------ */
 /* ----------------------------------- */
 
-boolean RANDOMIZER;
-boolean RAND_CHAOS;
+extern boolean RANDOMIZER;
+extern boolean RAND_CHAOS;
+
 randopool_enemy_t enemypool;
 odds_t randoenemy_odds;
 
 // T1, T2, T3, T4, T5, B, S (aligns with randotier_t enum)
-enemycount_t count_orig, count;
+enemycount_t count_orig, randcount;
 boolean enemycount_filled = false;
 
 randomap_t currentmap = {0,0};
@@ -70,12 +72,15 @@ randomap_t currentmap = {0,0};
 /* Function Implementation ----------- */
 /* ----------------------------------- */
 
-void VSLM_StartEnemyRandomizer(boolean spawnfx)
+// -----------------------------
+// VSLM_StartEnemyRandomizer
+// -----------------------------
+int VSLM_Rando_EnemyRandomizer(boolean spawnfx)
 {
     int count, i;
     mobj_t *actor;
     mobjtype_t bosstype[] = {MT_NULL, MT_NULL};
-    mobjtype_t spawnfog = (gamemode == commercial) ? MT_SPAWNFIRE : MT_TFOG;
+    mobjtype_t spawnfog = (gamemode == commercial) ? MT_SPAWNFIRE : MT_EXTRABFG;
     boolean bossmap = false, bossmap_softlock_risk = false;
 
     bossmap = VSLM_Rando_MapContainsTag666(
@@ -85,7 +90,7 @@ void VSLM_StartEnemyRandomizer(boolean spawnfx)
     );
 
     // The code below only runs once in the current map
-    if (!VSLM_Rando_PlayerInSameMap())
+    if (!enemypool.allocated)
     {
         // How many enemies are in the map?
         count = VSLM_CountEnemiesInMap();
@@ -112,14 +117,9 @@ void VSLM_StartEnemyRandomizer(boolean spawnfx)
     for (i = 0; i < enemypool.length; i++)
     {
         actor = enemypool.enemies[i];
-        if (!actor->norandom)
-        {
-            VSLM_ChangeMonsterType(actor, VSLM_Rando_DetermineType());
-            if(spawnfx)
-                P_SpawnMobj(actor->x, actor->y, actor->z, spawnfog);
-        }
-
-        VSLM_Rando_RareEnemySnd(actor);
+        VSLM_Rando_ReplaceEnemy(actor, NULL);
+        if (spawnfx)
+            P_SpawnMobj(actor->x, actor->y, actor->z, spawnfog);
     }
 
     // Spawn Tag 666 enemy (if no softlocks)
@@ -128,21 +128,22 @@ void VSLM_StartEnemyRandomizer(boolean spawnfx)
         if (!bossmap_softlock_risk)
         {
             actor = enemypool.enemies[VSLM_Rand(0, enemypool.length - 1)];
-            VSLM_ChangeMonsterType(actor, bosstype[0]);
-            VSLM_Rando_RareEnemySnd(actor);
+            VSLM_Rando_ReplaceEnemy(actor, &bosstype[0]);
         }
 
         if (bosstype[1] != MT_NULL)
         {
             actor = enemypool.enemies[VSLM_Rand(0, enemypool.length - 1)];
-            VSLM_ChangeMonsterType(actor, bosstype[1]);
-            VSLM_Rando_RareEnemySnd(actor);
+            VSLM_Rando_ReplaceEnemy(actor, &bosstype[1]);
         }
     }
 
     // Print stats after randomization
     DEH_printf("\nAfter randomization:\n");
     VSLM_Rando_PrintEnemyStats(false);
+
+    // Return total
+    return randcount.total;
 }
 
 /* ----------------------------------- */
@@ -154,18 +155,15 @@ void VSLM_Rando_AllocateEnemyPool(int size)
     uint32_t memsize;
     memsize = size * sizeof(mobj_t *);
 
-    // Don't allocate memory if it was already done in
-    // the current map.
-    VSLM_Rando_ClearEnemyPool();
     enemypool.enemies = Z_Malloc(memsize, PU_LEVEL, NULL);
     memset(enemypool.enemies, 0, memsize);
+    enemypool.allocated = 1;
     enemypool.length = size;
     enemypool.index = 0;
     VSLM_DEBUG("VSLM_Rando_AllocateEnemyPool: Allocated %u bytes to heap.",
                memsize);
 
-    currentmap.episode = gameepisode;
-    currentmap.map = gamemap;
+    
 }
 
 void VSLM_Rando_ClearEnemyPool(void)
@@ -222,7 +220,7 @@ void VSLM_Rando_PrintEnemyStats(boolean original)
     enemycount_t *enemycount;
 
     // Counting original enemies?
-    enemycount = (original) ? &count_orig : &count;
+    enemycount = (original) ? &count_orig : &randcount;
     memset(enemycount, 0, sizeof(enemycount_t));
     for (i = 0; i < enemypool.length; i++)
     {
@@ -651,4 +649,29 @@ boolean VSLM_Rando_PlayerInSameMap(void)
     if(currentmap.episode == gameepisode && currentmap.map == gamemap)
         return true;
     return false;
+}
+
+void VSLM_Rando_ReplaceEnemy(mobj_t *actor, mobjtype_t *type)
+{
+    /*
+    fixed_t x,y,z;
+    angle_t angle;
+    
+    // Preserve the angle and coordinates
+    // from old actor
+    x = actor->x;
+    y = actor->y;
+    z = actor->z;
+    angle = actor->angle;
+    
+    // Remove the old actor
+    P_RemoveMobj(actor);
+    
+    // Spawn the new Mobj
+    actor = P_SpawnMobj(x, y, z, (type) ? *type : VSLM_Rando_DetermineType());
+    actor->angle = angle;
+    */
+
+    VSLM_ChangeMonsterType(actor, (type) ? *type : VSLM_Rando_DetermineType());
+    VSLM_Rando_RareEnemySnd(actor);
 }

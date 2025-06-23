@@ -12,10 +12,10 @@
 	GNU General Public License for more details.
 
 	DESCRIPTION:
-	New randomizer logic
+	Randomizer - Types used for enemy logic
 */
-#ifndef _VSLM_DOOM_RANDO_LOGIC_H_
-#define _VSLM_DOOM_RANDO_LOGIC_H_
+#ifndef _VSLM_DOOM_RANDO_ENEMY_LOGIC_H_
+#define _VSLM_DOOM_RANDO_ENEMY_LOGIC_H_
 
 #include <doomtype.h>
 #include <doom/p_mobj.h>
@@ -40,6 +40,7 @@ typedef enum {
 
 typedef struct {
     mobj_t **enemies;
+    byte allocated;
     size_t length;
     size_t index;
 } randopool_enemy_t;
@@ -59,12 +60,5 @@ typedef struct {
     uint8_t episode;
     uint8_t map;
 } randomap_t;
-
-/* ----------------------------------- */
-/* Function Definitions -------------- */
-/* ----------------------------------- */
-
-// Randomize all enemies in the map
-void VSLM_StartEnemyRandomizer(boolean spawnfx);
 
 #endif
