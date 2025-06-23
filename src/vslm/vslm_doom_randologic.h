@@ -49,11 +49,22 @@ typedef struct {
     t4, t5, boss;
 } odds_t;
 
+#define ENEMYCOUNT_SIZE 7
+typedef struct {
+    uint16_t count[ENEMYCOUNT_SIZE];
+    uint16_t total;
+} enemycount_t;
+
+typedef struct {
+    uint8_t episode;
+    uint8_t map;
+} randomap_t;
+
 /* ----------------------------------- */
 /* Function Definitions -------------- */
 /* ----------------------------------- */
 
 // Randomize all enemies in the map
-void VSLM_StartEnemyRandomizer(void);
+void VSLM_StartEnemyRandomizer(boolean spawnfx);
 
 #endif

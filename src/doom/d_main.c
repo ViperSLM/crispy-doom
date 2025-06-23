@@ -81,6 +81,8 @@
 
 #include "doom_icon.c"
 
+
+#include "vslm_doom_randologic.h"
 // Lua bindings
 #include "i_lua.h"
 int luaopen_doom(lua_State *L);
@@ -1644,6 +1646,9 @@ void D_DoomMain (void)
 	sidemove[0] = sidemove[0]*scale/100;
 	sidemove[1] = sidemove[1]*scale/100;
     }
+
+    // ViperSLM: Enable randomizer
+    RANDOMIZER = M_CheckParm("-randomizer");
     
     // init subsystems
     DEH_printf("V_Init: allocate screens.\n");

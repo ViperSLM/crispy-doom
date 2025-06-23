@@ -1136,7 +1136,7 @@ void G_DoLoadLevel (void)
         L_LoadScript(maplumpinfo->name, "OnMapLoad");
 
         if(RANDOMIZER)
-            VSLM_StartEnemyRandomizer();
+            VSLM_StartEnemyRandomizer(false);
 
     }
 } 

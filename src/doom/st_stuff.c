@@ -376,6 +376,8 @@ cheatseq_t cheat_revive = CHEAT("revive", 0); // ViperSLM: Revive all enemies in
 cheatseq_t cheat_tag666 = CHEAT("sixsixsix", 0); // ViperSLM: Trigger Tag 666/667 events in map
 cheatseq_t cheat_playerpos = CHEAT("vslmxyz", 0); // ViperSLM: Print player's coordinates (X,Y,Z) to console
 cheatseq_t cheat_rando = CHEAT("random", 0); // ViperSLM: Toggle randomizer
+cheatseq_t cheat_rando2 = CHEAT("vslmzfg", 0); // ViperSLM: Trigger randomizer
+
 
 static char msg[ST_MSGWIDTH];
 
@@ -982,6 +984,15 @@ boolean ST_Responder(event_t *ev)
 
                 //int randocount = VSLM_RandomizeMonsters(true);
                 //ST_PrintMsg("%d monsters randomized", randocount);
+            }
+            else if (cht_CheckCheatSP(&cheat_rando2, ev->data2))
+            {
+                if (RANDOMIZER)
+                {
+                    VSLM_StartEnemyRandomizer(true);
+                }
+                else
+                    ST_PrintMsg("Randomizer not enabled.");
             }
             // [crispy] implement PrBoom+'s "notarget" cheat
             else if (cht_CheckCheatSP(&cheat_notarget, ev->data2) ||

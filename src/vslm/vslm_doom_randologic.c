@@ -31,22 +31,25 @@
 /* Function Prototypes --------------- */
 /* ----------------------------------- */
 
+void VSLM_Rando_AddEnemy(mobj_t *actor);
 void VSLM_Rando_AllocateEnemyPool(int size);
 void VSLM_Rando_ClearEnemyPool(void);
-void VSLM_Rando_AddEnemy(mobj_t *actor);
 void VSLM_Rando_PopulateEnemyPool(void);
-void VSLM_Rando_UpdateEnemyTiers(void);
-void VSLM_Rando_PrintEnemyStats(void);
 void VSLM_Rando_PreserveEnemyType(mobjtype_t actortype);
+void VSLM_Rando_PrintEnemyStats(boolean original);
+void VSLM_Rando_RareEnemySnd(mobj_t *actor);
 void VSLM_Rando_SetEnemyOdds(void);
 void VSLM_Rando_SetTierOdds(uint16_t t2, uint16_t t3, uint16_t t4, uint16_t t5,
                             uint16_t boss);
+void VSLM_Rando_UpdateEnemyTiers(void);
+
+int VSLM_Rando_CountEnemy(mobjtype_t actortype);
+mobjtype_t VSLM_Rando_DetermineType(void);
 const char *VSLM_Rando_GetTierStr(randotier_t t);
 randotier_t VSLM_Rando_GetEnemyTier(mobj_t *actor);
 boolean VSLM_Rando_MapContainsTag666(boolean *softlock, mobjtype_t *actortype,
                                      mobjtype_t *actortype2);
-int VSLM_Rando_CountEnemy(mobjtype_t actortype);
-mobjtype_t VSLM_Rando_DetermineType(void);
+boolean VSLM_Rando_PlayerInSameMap(void);
 
 /* ----------------------------------- */
 /* Global Variables ------------------ */
@@ -58,18 +61,21 @@ randopool_enemy_t enemypool;
 odds_t randoenemy_odds;
 
 // T1, T2, T3, T4, T5, B, S (aligns with randotier_t enum)
-const int randocountsize = 7;
-int randocount[randocountsize];
+enemycount_t count_orig, count;
+boolean enemycount_filled = false;
+
+randomap_t currentmap = {0,0};
 
 /* ----------------------------------- */
 /* Function Implementation ----------- */
 /* ----------------------------------- */
 
-void VSLM_StartEnemyRandomizer(void)
+void VSLM_StartEnemyRandomizer(boolean spawnfx)
 {
     int count, i;
     mobj_t *actor;
     mobjtype_t bosstype[] = {MT_NULL, MT_NULL};
+    mobjtype_t spawnfog = (gamemode == commercial) ? MT_SPAWNFIRE : MT_TFOG;
     boolean bossmap = false, bossmap_softlock_risk = false;
 
     bossmap = VSLM_Rando_MapContainsTag666(
@@ -78,55 +84,65 @@ void VSLM_StartEnemyRandomizer(void)
         &bosstype[1]
     );
 
-    // How many enemies are in the map?
-    count = VSLM_CountEnemiesInMap();
+    // The code below only runs once in the current map
+    if (!VSLM_Rando_PlayerInSameMap())
+    {
+        // How many enemies are in the map?
+        count = VSLM_CountEnemiesInMap();
 
-    // Allocate memory needed for the rando pool
-    VSLM_Rando_AllocateEnemyPool(count);
+        // Allocate memory needed for the rando pool
+        // (Skipped if ran again in the same map)
+        VSLM_Rando_AllocateEnemyPool(count);
 
-    // Populate the randomizer pool with
-    // the enemies in current map
-    VSLM_Rando_PopulateEnemyPool();
+        // Populate the randomizer pool with
+        // the enemies in current map
+        VSLM_Rando_PopulateEnemyPool();
 
-    // Print stats of original enemies
-    VSLM_Rando_PrintEnemyStats();
+        // Print stats of original enemies
+        VSLM_Rando_PrintEnemyStats(true);
 
-    // Handle Tag 666 events (before, softlock prevention)
-    if (bossmap && bossmap_softlock_risk)
-        VSLM_Rando_PreserveEnemyType(bosstype[0]);
+        // Handle Tag 666 events (before, softlock prevention)
+        if (bossmap && bossmap_softlock_risk)
+            VSLM_Rando_PreserveEnemyType(bosstype[0]);
 
-    // Randomize all enemies
-    VSLM_Rando_SetEnemyOdds();
+        // Randomize all enemies
+        VSLM_Rando_SetEnemyOdds();
+    }
+
     for (i = 0; i < enemypool.length; i++)
     {
         actor = enemypool.enemies[i];
         if (!actor->norandom)
+        {
             VSLM_ChangeMonsterType(actor, VSLM_Rando_DetermineType());
+            if(spawnfx)
+                P_SpawnMobj(actor->x, actor->y, actor->z, spawnfog);
+        }
 
-        // Play a sound if spawning an arch-vile or a boss
-        if (actor->type == MT_VILE)
-            S_StartSound(actor, sfx_vilact);
-        if (actor->type == MT_SPIDER || actor->type == MT_CYBORG)
-            S_StartSound(actor,
-                         (gamemode == commercial) ? sfx_boscub : sfx_telept);
+        VSLM_Rando_RareEnemySnd(actor);
     }
 
     // Spawn Tag 666 enemy (if no softlocks)
     if(bossmap)
     {
         if (!bossmap_softlock_risk)
-            VSLM_ChangeMonsterType(enemypool.enemies[VSLM_Rand(0, enemypool.length - 1)], bosstype[0]);
+        {
+            actor = enemypool.enemies[VSLM_Rand(0, enemypool.length - 1)];
+            VSLM_ChangeMonsterType(actor, bosstype[0]);
+            VSLM_Rando_RareEnemySnd(actor);
+        }
 
         if (bosstype[1] != MT_NULL)
-            VSLM_ChangeMonsterType(enemypool.enemies[VSLM_Rand(0, enemypool.length - 1)], bosstype[1]);
+        {
+            actor = enemypool.enemies[VSLM_Rand(0, enemypool.length - 1)];
+            VSLM_ChangeMonsterType(actor, bosstype[1]);
+            VSLM_Rando_RareEnemySnd(actor);
+        }
     }
 
     // Print stats after randomization
     DEH_printf("\nAfter randomization:\n");
-    VSLM_Rando_PrintEnemyStats();
-
-    // At the end. Free up memory
-    VSLM_Rando_ClearEnemyPool();
+    VSLM_Rando_PrintEnemyStats(false);
 }
 
 /* ----------------------------------- */
@@ -136,24 +152,31 @@ void VSLM_StartEnemyRandomizer(void)
 void VSLM_Rando_AllocateEnemyPool(int size)
 {
     uint32_t memsize;
-    memsize = size * sizeof(mobj_t*);
+    memsize = size * sizeof(mobj_t *);
 
-    // Allocate with PU_STATIC tag since we only need
-    // this to organise all the enemies in the map.
-    // This gets freed once we're done with it.
-    enemypool.enemies = Z_Malloc(memsize, PU_STATIC, NULL);
+    // Don't allocate memory if it was already done in
+    // the current map.
+    VSLM_Rando_ClearEnemyPool();
+    enemypool.enemies = Z_Malloc(memsize, PU_LEVEL, NULL);
     memset(enemypool.enemies, 0, memsize);
-
     enemypool.length = size;
     enemypool.index = 0;
     VSLM_DEBUG("VSLM_Rando_AllocateEnemyPool: Allocated %u bytes to heap.",
                memsize);
+
+    currentmap.episode = gameepisode;
+    currentmap.map = gamemap;
 }
 
 void VSLM_Rando_ClearEnemyPool(void)
 {
-    VSLM_DEBUG("VSLM_Rando_ClearEnemyPool: Freeing memory used by enemy pool.");
-    Z_Free(enemypool.enemies);
+    if (enemypool.enemies)
+    {
+        VSLM_DEBUG(
+            "VSLM_Rando_ClearEnemyPool: Discarding old enemy pool.");
+        //Z_Free(enemypool.enemies); // PU_LEVEL tags don't need to be freed.
+        enemypool.enemies = NULL;
+    }
     memset(&enemypool, 0, sizeof(randopool_enemy_t));
 }
 
@@ -192,31 +215,32 @@ void VSLM_Rando_AddEnemy(mobj_t *actor)
     enemypool.index++;
 }
 
-void VSLM_Rando_PrintEnemyStats(void)
+void VSLM_Rando_PrintEnemyStats(boolean original)
 {
     int i;
-    int total;
     mobj_t *ptr;
+    enemycount_t *enemycount;
 
-    memset(&randocount, 0, randocountsize * sizeof(int));
-    total = 0;
+    // Counting original enemies?
+    enemycount = (original) ? &count_orig : &count;
+    memset(enemycount, 0, sizeof(enemycount_t));
     for (i = 0; i < enemypool.length; i++)
     {
         ptr = enemypool.enemies[i];
-        randocount[(int)VSLM_Rando_GetEnemyTier(ptr)]++;
+        enemycount->count[(size_t)VSLM_Rando_GetEnemyTier(ptr)]++;
     }
 
     // Print the results
     DEH_printf("VSLM_Rando_PrintEnemyStats:\n\n");
-    for (i = 0; i < randocountsize; i++)
+    for (i = 0; i < ENEMYCOUNT_SIZE; i++)
     {
         if(gamemode != commercial && (i == 3 || i == 4 || i == 6))
             continue;
 
-        DEH_printf("%s:\t%d\n", VSLM_Rando_GetTierStr((randotier_t)i), randocount[i]);
-        total += randocount[i];
+        DEH_printf("%s:\t%d\n", VSLM_Rando_GetTierStr((randotier_t)i), enemycount->count[i]);
+        enemycount->total += enemycount->count[i];
     }
-    DEH_printf("\nTotal:\t%d\n", total);
+    DEH_printf("\nTotal:\t%d\n", enemycount->total);
 }
 
 // Selects random enemy of specific type and sets
@@ -368,10 +392,15 @@ boolean VSLM_Rando_MapContainsTag666(boolean *softlock, mobjtype_t *actortype,
                 if (actortype2)
                     *actortype2 = MT_BABY; // Arachnotron
             }
-            break;
 
-            // MAP32 is not counted because Commander Keen
-            // is never randomized, so no need to do anything.
+            // Not actually Tag 666, but just for some fun
+            if (gamemap == 32)
+            {
+                result = true;
+                if (actortype)
+                    *actortype = boss[VSLM_DoomRand() % (sizeof(boss) / sizeof(boss[0]))];
+            }
+            break;
 
         default: // Doom
             switch (gameepisode)
@@ -440,17 +469,17 @@ void VSLM_Rando_SetEnemyOdds(void)
             if (gamemap < 3)
                 VSLM_Rando_SetTierOdds(128, 512, 2048, 8192, 0);
             else if (gamemap < 7)
-                VSLM_Rando_SetTierOdds(80, 250, 1024, 8192, 65535);
+                VSLM_Rando_SetTierOdds(80, 250, 1024, 8192, 16384);
             else if (gamemap == 7)
-                VSLM_Rando_SetTierOdds(80, 0, 0, 8192, 65535);
+                VSLM_Rando_SetTierOdds(80, 0, 0, 8192, 16384);
             else if (gamemap < 12)
                 VSLM_Rando_SetTierOdds(64, 175, 512, 4096, 8192);
             else if (gamemap < 20)
-                VSLM_Rando_SetTierOdds(32, 130, 256, 1024, 4096);
+                VSLM_Rando_SetTierOdds(32, 130, 256, 1024, 8192);
             else if (gamemap < 25)
-                VSLM_Rando_SetTierOdds(24, 50, 64, 512, 2048);
+                VSLM_Rando_SetTierOdds(24, 50, 64, 512, 8192);
             else
-                VSLM_Rando_SetTierOdds(8, 25, 32, 128, 1024);
+                VSLM_Rando_SetTierOdds(8, 25, 32, 128, 4096);
             break;
 
         case shareware: // Doom Shareware (Same as retail E1M1, but no boss chance)
@@ -470,41 +499,41 @@ void VSLM_Rando_SetEnemyOdds(void)
             {
                 case 1:
                     if (gamemap < 3)
-                        VSLM_Rando_SetTierOdds(75, 750, 0, 0, 0);
+                        VSLM_Rando_SetTierOdds(250, 750, 0, 0, 0);
                     else if (gamemap < 5)
-                        VSLM_Rando_SetTierOdds(50, 500, 0, 0, 8192);
+                        VSLM_Rando_SetTierOdds(200, 500, 0, 0, 8192);
                     else if (gamemap < 7)
-                        VSLM_Rando_SetTierOdds(25, 250, 0, 0, 4096);
+                        VSLM_Rando_SetTierOdds(150, 250, 0, 0, 8192);
                     else
-                        VSLM_Rando_SetTierOdds(10, 0, 0, 0, 1024);
+                        VSLM_Rando_SetTierOdds(100, 0, 0, 0, 8192);
                     break;
                 case 2:
                     if (gamemap < 3)
-                        VSLM_Rando_SetTierOdds(50, 500, 0, 0, 8192);
+                        VSLM_Rando_SetTierOdds(250, 500, 0, 0, 8192);
                     else if (gamemap < 5)
-                        VSLM_Rando_SetTierOdds(50, 250, 0, 0, 4096);
+                        VSLM_Rando_SetTierOdds(200, 250, 0, 0, 8192);
                     else if (gamemap < 7)
-                        VSLM_Rando_SetTierOdds(40, 250, 0, 0, 2048);
+                        VSLM_Rando_SetTierOdds(150, 250, 0, 0, 8192);
                     else
-                        VSLM_Rando_SetTierOdds(30, 50, 0, 0, 1024);
+                        VSLM_Rando_SetTierOdds(100, 50, 0, 0, 8192);
                     break;
                 case 3:
                     if (gamemap < 3)
-                        VSLM_Rando_SetTierOdds(20, 250, 0, 0, 8192);
+                        VSLM_Rando_SetTierOdds(250, 250, 0, 0, 8192);
                     else if (gamemap < 5)
-                        VSLM_Rando_SetTierOdds(15, 100, 0, 0, 4096);
+                        VSLM_Rando_SetTierOdds(200, 100, 0, 0, 8192);
                     else if (gamemap < 7)
-                        VSLM_Rando_SetTierOdds(10, 50, 0, 0, 2048);
+                        VSLM_Rando_SetTierOdds(150, 50, 0, 0, 8192);
                     else
-                        VSLM_Rando_SetTierOdds(5, 20, 0, 0, 1024);
+                        VSLM_Rando_SetTierOdds(100, 20, 0, 0, 8192);
                     break;
                 case 4:
                     if (gamemap == 1 || gamemap == 9)
-                        VSLM_Rando_SetTierOdds(50, 100, 0, 0, 4096);
+                        VSLM_Rando_SetTierOdds(50, 100, 0, 0, 8192);
                     else if (gamemap < 6)
-                        VSLM_Rando_SetTierOdds(25, 75, 0, 0, 2048);
+                        VSLM_Rando_SetTierOdds(25, 75, 0, 0, 8192);
                     else
-                        VSLM_Rando_SetTierOdds(20, 50, 0, 0, 1024);
+                        VSLM_Rando_SetTierOdds(20, 50, 0, 0, 8192);
                     break;
             }
             break;
@@ -517,11 +546,27 @@ void VSLM_Rando_SetEnemyOdds(void)
 void VSLM_Rando_SetTierOdds(uint16_t t2, uint16_t t3, uint16_t t4, uint16_t t5,
                             uint16_t boss)
 {
-    randoenemy_odds.t2 = t2;
-    randoenemy_odds.t3 = t3;
-    randoenemy_odds.t4 = t4;
-    randoenemy_odds.t5 = t5;
-    randoenemy_odds.boss = boss;
+    randoenemy_odds.t2 = (t2 <= 0) ? 0
+                         : ((t2 - count_orig.count[R_TIER2]) < 4)
+                             ? 4
+                             : t2 - count_orig.count[R_TIER2];
+    randoenemy_odds.t3 = (t3 <= 0) ? 0
+                         : ((t3 - count_orig.count[R_TIER3]) < 4)
+                             ? 4
+                             : t3 - count_orig.count[R_TIER3];
+
+    randoenemy_odds.t4 = (t4 <= 0) ? 0
+                         : ((t4 - count_orig.count[R_TIER4]) < 4)
+                             ? 4
+                             : t4 - count_orig.count[R_TIER4];
+    randoenemy_odds.t5 = (t5 <= 0) ? 0
+                         : ((t5 - count_orig.count[R_TIER5]) < 4)
+                             ? 4
+                             : t5 - count_orig.count[R_TIER5];
+    randoenemy_odds.boss = (boss <= 0) ? 0
+                           : ((boss - (count_orig.count[R_BOSS] * 4096)) < 256)
+                               ? 256
+                               : boss - (count_orig.count[R_BOSS] * 4096);
 }
 
 // This is where the enemy randomization actually happens
@@ -538,7 +583,7 @@ mobjtype_t VSLM_Rando_DetermineType(void)
     const size_t t4size = sizeof(tier4) / sizeof(tier4[0]);
     const size_t t5size = sizeof(tier5) / sizeof(tier5[0]);
     const size_t bsize = sizeof(boss) / sizeof(boss[0]);
-    const int secret_odds = (gamemode == commercial && gamemap > 30) ? 5 : 8192;
+    const int secret_odds = (gamemode == commercial && gamemap > 30) ? 2 : 65535;
     const int chaingunner_odds = (gamemode == commercial) ? 25 : 0;
 
     // Only use Tier 4 and 5 enemies in Doom 2
@@ -548,11 +593,14 @@ mobjtype_t VSLM_Rando_DetermineType(void)
         if (VSLM_Rand(1, secret_odds) == secret_odds)
             return MT_WOLFSS;
 
-        if (randoenemy_odds.t5 != 0 && VSLM_Rand(1, randoenemy_odds.t5) == randoenemy_odds.t5)
-            return tier5[VSLM_DoomRand() % t5size]; // Tier 5 enemy (Arch-vile)
 
-        if (randoenemy_odds.t4 != 0 && VSLM_Rand(1, randoenemy_odds.t4) == randoenemy_odds.t4)
+        if (randoenemy_odds.t4 != 0 &&
+            VSLM_Rand(1, randoenemy_odds.t4) == randoenemy_odds.t4)
             return tier4[VSLM_DoomRand() % t4size]; // Tier 4 enemy
+
+        if (randoenemy_odds.t5 != 0 &&
+            VSLM_Rand(1, randoenemy_odds.t5) == randoenemy_odds.t5)
+            return tier5[VSLM_DoomRand() % t5size]; // Tier 5 enemy (Arch-vile)
     }
 
     // Tier 3
@@ -573,4 +621,34 @@ mobjtype_t VSLM_Rando_DetermineType(void)
 
     // If all above checks fail, spawn a Tier 1 monster
     return tier1[VSLM_DoomRand() % t1size];
+}
+
+// Play a sound indicator if actor is a tier 5 or boss monster
+void VSLM_Rando_RareEnemySnd(mobj_t *actor)
+{
+    int snd = sfx_None;
+    switch(actor->type)
+    {
+        default:
+            break;
+
+        // Tier 5 (Arch-vile)
+        case MT_VILE:
+            snd = sfx_vilact;
+            break;
+
+        // Boss (Spider Mastermind + Cyberdemon)
+        case MT_SPIDER:
+        case MT_CYBORG:
+            snd = (gamemode == commercial) ? sfx_boscub : sfx_telept;
+            break;
+    }
+    S_StartSound(actor, snd);
+}
+
+boolean VSLM_Rando_PlayerInSameMap(void)
+{
+    if(currentmap.episode == gameepisode && currentmap.map == gamemap)
+        return true;
+    return false;
 }

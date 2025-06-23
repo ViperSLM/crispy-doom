@@ -25,7 +25,7 @@
 // ------------------------
 // Prototypes
 // ------------------------
-boolean VSLM_IsMonsterGibbed(mobj_t *actor);
+//boolean VSLM_IsMonsterGibbed(mobj_t *actor);
 
 // ------------------------
 // VSLM_CountEnemiesInMap
@@ -34,7 +34,6 @@ int VSLM_CountEnemiesInMap(void)
 {
     int count;
     thinker_t *th;
-    mobj_t *actor;
 
     count = 0;
     for (th = thinkercap.next; th != &thinkercap; th = th->next)
@@ -84,6 +83,7 @@ void VSLM_RespawnMonster(mobj_t* actor)
         actor->health = info->spawnhealth;
         actor->target = NULL;
         actor->tracer = NULL;
+        actor->norandom = false;
         S_StartSound(actor, sfx_slop);
         return;
     }
@@ -112,6 +112,7 @@ void VSLM_RespawnMonster(mobj_t* actor)
     fog = P_SpawnMobj(x, y, z, actor->type);
     fog->spawnpoint = actor->spawnpoint;
     fog->angle = ANG45 * (mthing->angle / 45);
+    fog->norandom = false;
 
     // Count respawned monsters
     extrakills++;
