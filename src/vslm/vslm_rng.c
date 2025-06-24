@@ -22,11 +22,16 @@
 
 #include <time.h>
 
-/* -- Function prototypes -- */
+/* ----------------------------------- */
+/* Function Prototypes --------------- */
+/* ----------------------------------- */
 
+VSLM_INTSIZE VSLM_XOR_Shift(void);
 void VSLM_FreeSeed(void);
 
-/* ------------------------- */
+/* ----------------------------------- */
+/* Global Variables ------------------ */
+/* ----------------------------------- */
 
 #ifdef VSLM_64BIT
 VSLM_INTSIZE rol64(VSLM_INTSIZE x, int k)
@@ -49,6 +54,13 @@ typedef struct
 
 xorstate_t *rngstate;
 
+/* ----------------------------------- */
+/* Function Implementation ----------- */
+/* ----------------------------------- */
+
+// -----------------------------
+// VSLM_SetRandomSeed
+// -----------------------------
 void VSLM_SetRandomSeed(VSLM_INTSIZE seed)
 {
     int i;
@@ -102,6 +114,33 @@ void VSLM_SetRandomSeed(VSLM_INTSIZE seed)
 #endif
 }
 
+// -----------------------------
+// VSLM_Rand
+// -----------------------------
+int VSLM_Rand(int min, int max)
+{
+    return min + (VSLM_XOR_Shift() % (max - min + 1));
+}
+
+// -----------------------------
+// VSLM_DoomRand
+// -----------------------------
+int VSLM_DoomRand(void)
+{
+    return VSLM_Rand(0, 255);
+}
+
+/* ----------------------------------- */
+/* Internal Functions ---------------- */
+/* ----------------------------------- */
+
+// De-allocate rngState pointer
+void VSLM_FreeSeed(void)
+{
+    DEH_printf("VSLM_FreeSeed: Deallocating random seed.\n");
+    Z_Free(rngstate);
+}
+
 // Xorshift algorithm (xoshiro256++ for 64-bit, xorwow for 32-bit)
 VSLM_INTSIZE VSLM_XOR_Shift(void)
 {
@@ -152,24 +191,3 @@ VSLM_INTSIZE VSLM_XOR_Shift(void)
     return t + rngstate->counter;
 #endif
 }
-
-int VSLM_Rand(int min, int max)
-{
-    return min + (VSLM_XOR_Shift() % (max - min + 1));
-}
-
-int VSLM_DoomRand(void)
-{
-    return VSLM_Rand(0, 255);
-}
-
-/* --- Internal functions --- */
-
-// De-allocate rngState pointer
-void VSLM_FreeSeed(void)
-{
-    DEH_printf("VSLM_FreeSeed: Deallocating random seed.\n");
-    Z_Free(rngstate);
-}
-
-/* -------------------------- */
